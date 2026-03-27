@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
   town : String ,
   username : String ,
   password : String , // hashed pwd 
-  rating : Number , // the average of the ratings of his properties
+  rating : {type :Number,default: null} , // the average of the ratings of his properties 
+  // when it is null , in the ui we show 'not rated yet' 
   email : String ,
   phone : String ,
   contact : [String] // a links to a whatsupp or facebook ... accounts where you can contact it 

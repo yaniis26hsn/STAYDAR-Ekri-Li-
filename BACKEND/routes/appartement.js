@@ -1,6 +1,6 @@
 import express from 'express'
 import Appartement from '../models/Appartement.js'
-
+import Rating from '../models/Rating.js';
 const router = express.Router() ;
 
 router.get('/api/v1/appartements', async (req,res)=>{
@@ -9,6 +9,7 @@ router.get('/api/v1/appartements', async (req,res)=>{
 })
 
 router.post('/api/v1/appartement' , async (req,res)=>{
+// here one important thing must be sent is the id of the owner , it is necessary
   const  newAppart = new Appartement(req.body)
   await newAppart.save() ;
   res.send("successfully saved") ;
@@ -56,7 +57,7 @@ router.get('/api/v1/getByType/:type', async (req, res) => {
     res.send(apps);
 
 });
-// this can handle lower/higher than "price/surface but fixing the other to 0 or 999999
+// this can handle lower/higher than "price/surface but fixing the other to 0 or max
 router.get('/api/v1/betweenPrice/:price1/:price2', async (req , res)=>{
   let theSmallPrice = Number(req.params.price1) > Number(req.params.price2) ? Number(req.params.price2) : Number(req.params.price1) ;
   let theOtherPrice = Number(req.params.price1) < Number(req.params.price2) ? Number(req.params.price2) : Number(req.params.price1) ;
@@ -92,7 +93,7 @@ router.get('/api/v1/getByTown/:town', async (req, res) => {
 
 });
 router.put('/api/v1/appartement/:id', async (req, res) => {
-      // update all fields at once
+      // update all fields at once except rating 
     const theApp = await Appartement.findById(req.params.id);
     theApp.price = req.body.price;
     theApp.coordX = req.body.coordX;
@@ -164,5 +165,73 @@ router.get('/api/v1/search', async (req, res) => {
     const apps = await Appartement.find(query) ;
     res.send(apps) ;
 }) ;
+
+// router.put('/api/v1/rateAppartement/:rating' , async (req,res)=>{
+//     // Uid : user id and Aid is Appar id
+//     const newRating = Number(req.params.rating) ;
+
+//     if( newRating> 5 ||newRating < 0 ) {res.send("invalid rating value"); return ;} ; 
+//     let rating = await Rating.findOne({userID: req.query.Uid , AppartementID : req.query.Aid}) ;
+//      const theApp =  await Appartement.findById(req.query.Aid) ;
+//      if(theApp== null){res.send("appartement not found") ; return ;}
+//     if(rating==null){
+//       rating = new Rating({
+//     userID : req.query.Uid,
+//     AppartementID : req.query.Aid ,
+//     theRating : newRating ,
+//      date : new Date() 
+//       }) 
+   
+//     theApp.rateSum += newRating ;
+//     theApp.ratersNbr ++ ;
+//     await rating.save() ;
+//     await theApp.save() ;
+//     // for consistency in case of an error , i should start saving the rating first
+//     }else{
+//         theApp.rateSum = theApp.rateSum - rating.theRating + newRating;
+//         rating.theRating = newRating ; 
+//         rating.date = new Date() ;
+//         await rating.save() ;
+//         await theApp.save() ;
+
+//     }
+//     res.send("success") ;
+
+// })
+router.put('/api/v1/rateAppartement/:rating' , async (req,res)=>{
+    
+    // Uid : user id and Aid is Appar id and there are both sent in the body 
+    const newRating = Number(req.params.rating) ;
+
+    if( newRating> 5 ||newRating < 0 ) {res.send("invalid rating value"); return ;} ;
+    const theApp =  await Appartement.findById(req.body.Aid) ;
+    if (!theApp) { return res.send('appartement not found'); }
+    const rating = await Rating.findOne({ userID: req.body.Uid, AppartementID: req.body.Aid });
+        
+    if (!rating) {
+      // in case it is a new rating we should increments the raters number
+      theApp.ratersNbr++;
+     }else{
+          theApp.rateSum = theApp.rateSum - rating.theRating + newRating;
+     }
+      await theApp.save() ;
+
+await Rating.updateOne(
+  { userID: req.body.Uid, AppartementID: req.body.Aid}, // filter
+  { 
+    $set: { 
+      theRating: newRating, 
+      date: new Date() 
+    } 
+  },
+  { upsert: true }  // insert if not found
+)
+res.send('seccess') ;
+})
+
+router.get('/api/v1/getFamousAppartments/:numberOfRaters' , async (req,res)=>{
+   const apps =  await Appartement.find({ratersNbr : {$gt: Number(req.params.numberOfRaters)}}) ;
+    res.send(apps) ;
+})
 
 export default router ;
