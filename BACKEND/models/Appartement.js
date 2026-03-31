@@ -5,6 +5,7 @@ const AppartementSchema = new mongoose.Schema({
   town : String ,
   price: Number,
   surface: Number ,
+  description : String , // it is provided by the owner 
   type: String ,
   rateSum : {type :Number , default: null} ,
   ratersNbr : {type :Number , default: null} ,
