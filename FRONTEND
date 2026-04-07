@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DarStay - Location & Voyage en Algérie</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .card-hover { transition: all 0.3s; }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+    .tab-active { border-bottom: 3px solid #c2410f; color: #c2410f; }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-4xl">🏠</span>
+        <h1 class="text-3xl font-bold text-[#c2410f]">DarStay</h1>
+      </div>
+
+      <div class="flex items-center gap-8 text-lg">
+        <a href="#" onclick="switchTab(0)" class="tab-active font-medium">Logements</a>
+        <a href="#" onclick="switchTab(1)" class="font-medium hover:text-[#c2410f]">Restaurants</a>
+        <a href="#" onclick="switchTab(2)" class="font-medium hover:text-[#c2410f]">Transport</a>
+        <a href="#" onclick="switchTab(3)" class="font-medium hover:text-[#c2410f]">Planning</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button class="px-6 py-2 border rounded-3xl font-medium">Devenir hôte</button>
+        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-3xl cursor-pointer">
+          <i class="fas fa-user-circle text-2xl"></i>
+          <span class="font-medium">Yanis</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-r from-[#c2410f] to-orange-600 text-white py-20">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <h1 class="text-6xl font-bold mb-4">Ton séjour parfait en Algérie commence ici</h1>
+      <p class="text-2xl mb-10">Logements • Restaurants • Transport • Planning</p>
+      
+      <div class="max-w-4xl mx-auto bg-white text-black rounded-3xl p-3 shadow-2xl">
+        <div class="flex gap-4">
+          <input id="search" type="text" placeholder="Où allez-vous ? (Alger, Oran...)" 
+                 class="flex-1 px-8 py-6 outline-none text-lg rounded-3xl">
+          <button onclick="searchAll()" 
+                  class="bg-[#c2410f] text-white px-12 py-6 rounded-3xl font-semibold flex items-center gap-3 text-xl">
+            <i class="fas fa-search"></i> Rechercher
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tabs Content -->
+  <div class="max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Logements -->
+    <div id="tab-0" class="tab-content">
+      <h2 class="text-4xl font-semibold mb-8">🏡 Logements disponibles</h2>
+      <div id="listings" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
+    </div>
+
+    <!-- Restaurants -->
+    <div id="tab-1" class="tab-content hidden">
+      <h2 class="text-4xl font-semibold mb-8">🍽️ Restaurants</h2>
+      <div id="restaurants" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
+    </div>
+
+    <!-- Transport -->
+    <div id="tab-2" class="tab-content hidden">
+      <h2 class="text-4xl font-semibold mb-8">🚗 Transport</h2>
+      <div id="transport" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
+    </div>
+
+    <!-- Planning -->
+    <div id="tab-3" class="tab-content hidden">
+      <h2 class="text-4xl font-semibold mb-8">📅 Mon Planning</h2>
+      <div class="bg-white p-8 rounded-3xl text-center text-xl">
+        <p class="mb-6">Ton planning de séjour sera ici</p>
+        <button class="bg-[#c2410f] text-white px-10 py-4 rounded-3xl">Créer un planning</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Données mock (tu les récupéreras du backend plus tard)
+    const apartments = [
+      {id:1, title:"Villa avec piscine à Tipaza", city:"Tipaza", price:8500, image:"https://source.unsplash.com/random/600x400/?villa"},
+      {id:2, title:"Riad traditionnel à Alger", city:"Alger", price:6200, image:"https://source.unsplash.com/random/600x400/?riad"},
+      {id:3, title:"Maison vue mer à Béjaïa", city:"Béjaïa", price:9800, image:"https://source.unsplash.com/random/600x400/?beach"},
+    ];
+
+    const restaurants = [
+      {id:1, title:"Le Casbah - Cuisine traditionnelle", city:"Alger", price:1200},
+      {id:2, title:"Chez Ali - Fruits de mer", city:"Oran", price:1800},
+    ];
+
+    const transports = [
+      {id:1, title:"Voiture avec chauffeur", city:"Alger", price:4500},
+      {id:2, title:"Taxi premium", city:"Tipaza", price:2800},
+    ];
+
+    function renderCards(containerId, data, type) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      data.forEach(item => {
+        const card = `
+          <div class="card-hover bg-white rounded-3xl overflow-hidden shadow">
+            ${type === 'apartment' ? `<img src="${item.image}" class="w-full h-60 object-cover">` : ''}
+            <div class="p-6">
+              <h3 class="font-semibold text-xl">${item.title}</h3>
+              <p class="text-gray-500">${item.city}</p>
+              <p class="text-2xl font-bold text-[#c2410f] mt-4">${item.price.toLocaleString('fr-DZ')} DA</p>
+              <button onclick="alert('Réservation ouverte pour ${item.title}')" 
+                      class="mt-6 w-full bg-[#c2410f] text-white py-4 rounded-3xl font-medium">
+                Réserver
+              </button>
+            </div>
+          </div>
+        `;
+        container.innerHTML += card;
+      });
+    }
+
+    function switchTab(n) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + n).classList.remove('hidden');
+    }
+
+    function searchAll() {
+      const query = document.getElementById('search').value.toLowerCase();
+      const filtered = apartments.filter(a => 
+        a.title.toLowerCase().includes(query) || a.city.toLowerCase().includes(query)
+      );
+      renderCards('listings', filtered, 'apartment');
+    }
+
+    // Chargement initial
+    window.onload = () => {
+      renderCards('listings', apartments, 'apartment');
+      renderCards('restaurants', restaurants, 'restaurant');
+      renderCards('transport', transports, 'transport');
+    };
+  </script>
+</body>
+</html>
