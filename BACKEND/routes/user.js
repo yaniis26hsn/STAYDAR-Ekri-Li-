@@ -11,17 +11,17 @@ getUserRating
 
 const router = express.Router() ;
 
-router.post('api/v1/user', createUser) 
-router.delete('api/v1/user/:id' , deleteUser)
-router.get('api/v1/user' , getUsers)
+router.post('/user', createUser) 
+router.delete('/user/:id' , deleteUser)
+router.get('/user' , getUsers)
 
-router.get('api/v1/user/:id' , getUserById)
+router.get('/user/:id' , getUserById)
 
-router.get('api/v1/getUsersOfATown/:town' , getUsersOfATown)
+router.get('/getUsersOfATown/:town' , getUsersOfATown)
 
-router.put('api/v1/user/:id' , updateUser )
+router.put('/user/:id' , updateUser )
 
-router.get('api/v1/userRating/:id' , getUserRating )
+router.get('/userRating/:id' , getUserRating )
 
 export default router ;
 

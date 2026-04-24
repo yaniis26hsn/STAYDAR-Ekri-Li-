@@ -23,40 +23,40 @@ getFamousAppartments
 } from '../controllers/appartement.js'
 const router = express.Router() ;
 
-router.get('/api/v1/appartements', getAppartements)
+router.get('/appartements', getAppartements)
 
-router.post('/api/v1/appartement' , createAppartement)
+router.post('/appartement' , createAppartement)
 
-router.delete('/api/v1/appartement/:id' , deleteAppartement)
+router.delete('/appartement/:id' , deleteAppartement)
  
-router.get('/api/v1/closeAppartements', getCloseAppartements);
+router.get('/closeAppartements', getCloseAppartements);
 
-router.get('/api/v1/getByType/:type', getByType);
+router.get('/getByType/:type', getByType);
 // this can handle lower/higher than "price/surface but fixing the other to 0 or max
-router.get('/api/v1/betweenPrice/:price1/:price2', betweenPrice) ;
+router.get('/betweenPrice/:price1/:price2', betweenPrice) ;
 
-router.get('/api/v1/betweenSurface/:surface1/:surface2', betweenSurface) ;
+router.get('/betweenSurface/:surface1/:surface2', betweenSurface) ;
 
 // here to get higher than replace rating2 by 5 
-router.get('/api/v1/betweenRating/:rating1/:rating2', betweenRating) ;
+router.get('/betweenRating/:rating1/:rating2', betweenRating) ;
 
-router.get('/api/v1/getByTown/:town', getByTown);
-router.put('/api/v1/appartement/:id', updateAppartement);
+router.get('/getByTown/:town', getByTown);
+router.put('/appartement/:id', updateAppartement);
 
-router.put('/api/v1/updatePrice/:newPrice' , updatePrice )
+router.put('/updatePrice/:newPrice' , updatePrice )
 // descending 
-router.get('/api/v1/sortByPrice' , sortByPrice)
-router.get('/api/v1/sortBySurface', sortBySurface);
+router.get('/sortByPrice' , sortByPrice)
+router.get('/sortBySurface', sortBySurface);
 
-router.get('/api/v1/sortByRating', sortByRating);
+router.get('/sortByRating', sortByRating);
 // ascending 
-router.get('/api/v1/sortByPriceAsc', sortByPriceAsc);
+router.get('/sortByPriceAsc', sortByPriceAsc);
 
-router.get('/api/v1/sortBySurfaceAsc', sortBySurfaceAsc);
+router.get('/sortBySurfaceAsc', sortBySurfaceAsc);
 
-router.get('/api/v1/sortByRatingAsc', sortByRatingAsc);
+router.get('/sortByRatingAsc', sortByRatingAsc);
 
-router.get('/api/v1/search', search) ;
+router.get('/search', search) ;
 
 // router.put('/api/v1/rateAppartement/:rating' , async (req,res)=>{
 //     // Uid : user id and Aid is Appar id
@@ -90,8 +90,8 @@ router.get('/api/v1/search', search) ;
 //     res.send("success") ;
 
 // })
-router.put('/api/v1/rateAppartement/:rating' , rateAppartement)
+router.put('/rateAppartement/:rating' , rateAppartement)
 
-router.get('/api/v1/getFamousAppartments/:numberOfRaters' , getFamousAppartments)
+router.get('/getFamousAppartments/:numberOfRaters' , getFamousAppartments)
 
 export default router ;
