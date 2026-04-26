@@ -1,13 +1,7 @@
 import User from '../models/User.js';
 
-export const createUser = async (req,res)=>{
-    //TODO : adding new user , but i'll need that the cridintials (email/phone) doesn't already exist in the DB
-    const newUser = new User(req.body) 
-    // the default value of the rating should be null
-    await newUser.save() ;
-    res.send("the user was successfully added ") ;
-    
-} 
+
+
 export const deleteUser = async (req,res)=>{
     await User.findByIdAndDelete(req.params.id) ;
     res.send("user was successfuly deleted") ;
