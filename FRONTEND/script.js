@@ -1,6 +1,9 @@
 const API_BASE = "http://localhost:4000/api/v1";
+const CLOSE_RADIUS_KM = 15;
 let appartements = [];
+let displayedAppartements = [];
 let selectedReservation = null;
+let cursorGlow = null;
 
 async function fetchListings() {
   const container = document.getElementById("listings");
@@ -24,6 +27,7 @@ async function fetchListings() {
 
 function renderListings(data) {
   const container = document.getElementById("listings");
+  displayedAppartements = Array.isArray(data) ? [...data] : [];
 
   if (!Array.isArray(data) || data.length === 0) {
     updateListingSummary("0 resultat");
@@ -46,39 +50,39 @@ function renderListings(data) {
       : "Prix non renseigne";
 
     return `
-      <div class="card-hover listing-card bg-[#12141a] border border-white/14 rounded-3xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
-        <div class="listing-visual h-60 bg-[radial-gradient(circle_at_top,_rgba(251,146,60,0.34),_rgba(18,20,26,0.98)_58%)]">
+      <article class="card-hover listing-card">
+        <div class="listing-visual">
           <div class="listing-badge">${badge}</div>
           <div class="listing-visual-copy">
             <span class="listing-visual-kicker">${town}</span>
             <span class="listing-visual-title">${surface}</span>
           </div>
         </div>
-        <div class="p-6">
-          <div class="flex items-start justify-between gap-4 mb-4">
+        <div class="listing-body">
+          <div class="listing-topline">
             <div>
-              <h3 class="font-semibold text-xl text-white">${title}</h3>
-              <p class="text-slate-400 text-sm mt-1">${address}</p>
+              <h3 class="listing-title">${title}</h3>
+              <p class="listing-address">${address}</p>
             </div>
-            <span class="bg-orange-500/16 text-orange-100 border border-orange-400/30 px-3 py-1 rounded-full text-sm font-medium">${surface}</span>
+            <span class="listing-surface">${surface}</span>
           </div>
           <div class="listing-meta">
             <span><i class="fas fa-location-dot"></i> ${town}</span>
             <span><i class="fas fa-bolt"></i> Disponible</span>
           </div>
-          <p class="text-slate-200 mt-4">${teaser}</p>
+          <p class="listing-description">${teaser}</p>
           <div class="listing-footer">
             <div>
               <span class="listing-price-label">A partir de</span>
-              <p class="text-2xl font-bold text-orange-300 mt-1">${price}</p>
+              <p class="listing-price">${price}</p>
             </div>
             <button onclick="openAuthModal('${item._id || ""}', '${escapeForAttribute(title)}')"
-                    class="listing-cta mt-6 w-full bg-orange-500 text-white py-4 rounded-3xl font-medium shadow-[0_18px_40px_rgba(249,115,22,0.24)]">
+                    class="listing-cta">
               Reserver
             </button>
           </div>
         </div>
-      </div>
+      </article>
     `;
   }).join("");
 }
@@ -184,7 +188,7 @@ function switchTab(n, event) {
   if (event) event.currentTarget.classList.add("tab-active");
 }
 
-function searchAll() {
+async function searchAll() {
   const query = document.getElementById("search").value.trim().toLowerCase();
 
   if (!query) {
@@ -192,15 +196,179 @@ function searchAll() {
     return;
   }
 
-  const filteredAppartements = appartements.filter((item) => {
-    return [item.town, item.address, item.type, item.description]
-      .filter(Boolean)
-      .some((value) => value.toLowerCase().includes(query));
-  });
+  const container = document.getElementById("listings");
+  updateListingSummary(`Recherche pour ${query}...`);
+  container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Recherche en cours...</p>';
 
-  renderListings(filteredAppartements);
+  try {
+    const res = await fetch(`${API_BASE}/getByTown/${encodeURIComponent(query)}`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const results = await res.json();
+    renderListings(results);
+  } catch (err) {
+    console.error("Erreur recherche par ville:", err);
+    updateListingSummary("Recherche indisponible");
+    container.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible de rechercher cette ville.</p>';
+  }
+}
+
+function findClosestAppartements() {
+  if (!navigator.geolocation) {
+    updateListingSummary("Geolocalisation indisponible");
+    document.getElementById("listings").innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Votre navigateur ne supporte pas la geolocalisation.</p>';
+    return;
+  }
+
+  const container = document.getElementById("listings");
+  updateListingSummary("Recherche des logements proches...");
+  container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Autorisez la geolocalisation pour afficher les logements proches.</p>';
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
+      const endpoint = `${API_BASE}/closeAppartements?X=${encodeURIComponent(latitude)}&Y=${encodeURIComponent(longitude)}&radius=${CLOSE_RADIUS_KM}`;
+      await loadListingsFromEndpoint(endpoint, `Logements dans un rayon de ${CLOSE_RADIUS_KM} km`);
+    },
+    (error) => {
+      console.error("Erreur geolocalisation:", error);
+      updateListingSummary("Geolocalisation refusee");
+      container.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible d obtenir votre position.</p>';
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+}
+
+async function applyFilters() {
+  const type = document.getElementById("filter-type").value.trim();
+  const minPrice = document.getElementById("filter-min-price").value.trim();
+  const maxPrice = document.getElementById("filter-max-price").value.trim();
+  const minSurface = document.getElementById("filter-min-surface").value.trim();
+  const maxSurface = document.getElementById("filter-max-surface").value.trim();
+  const sort = document.getElementById("filter-sort").value.trim();
+  const town = document.getElementById("search").value.trim().toLowerCase();
+
+  const filtersUsed = [
+    Boolean(town),
+    Boolean(type),
+    Boolean(minPrice || maxPrice),
+    Boolean(minSurface || maxSurface)
+  ].filter(Boolean).length;
+
+  let endpoint = `${API_BASE}/appartements`;
+
+  if (filtersUsed === 0 && sort) {
+    endpoint = getSortEndpoint(sort);
+  } else if (filtersUsed <= 1) {
+    if (town) {
+      endpoint = `${API_BASE}/getByTown/${encodeURIComponent(town)}`;
+    } else if (type) {
+      endpoint = `${API_BASE}/getByType/${encodeURIComponent(type)}`;
+    } else if (minPrice || maxPrice) {
+      endpoint = `${API_BASE}/betweenPrice/${minPrice || 0}/${maxPrice || 999999999}`;
+    } else if (minSurface || maxSurface) {
+      endpoint = `${API_BASE}/betweenSurface/${minSurface || 0}/${maxSurface || 999999999}`;
+    }
+  } else {
+    const params = new URLSearchParams();
+    if (town) params.set("town", town);
+    if (type) params.set("type", type);
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    if (minSurface) params.set("minSurface", minSurface);
+    if (maxSurface) params.set("maxSurface", maxSurface);
+    endpoint = `${API_BASE}/search?${params.toString()}`;
+  }
+
+  await loadListingsFromEndpoint(endpoint, "Filtrage en cours...");
+
+  if (sort && filtersUsed > 0) {
+    const sorted = [...displayedAppartements].sort(getSortComparator(sort));
+    renderListings(sorted);
+  }
+}
+
+function resetFilters() {
+  document.getElementById("filter-type").value = "";
+  document.getElementById("filter-min-price").value = "";
+  document.getElementById("filter-max-price").value = "";
+  document.getElementById("filter-min-surface").value = "";
+  document.getElementById("filter-max-surface").value = "";
+  document.getElementById("filter-sort").value = "";
+  document.getElementById("search").value = "";
+  fetchListings();
+}
+
+async function loadListingsFromEndpoint(endpoint, loadingMessage) {
+  const container = document.getElementById("listings");
+  updateListingSummary(loadingMessage);
+  container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Chargement...</p>';
+
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const results = await res.json();
+    renderListings(results);
+  } catch (err) {
+    console.error("Erreur filtrage:", err);
+    updateListingSummary("Filtrage indisponible");
+    container.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible d appliquer les filtres.</p>';
+  }
+}
+
+function getSortEndpoint(sort) {
+  const sortRoutes = {
+    "price-desc": `${API_BASE}/sortByPrice`,
+    "price-asc": `${API_BASE}/sortByPriceAsc`,
+    "surface-desc": `${API_BASE}/sortBySurface`,
+    "surface-asc": `${API_BASE}/sortBySurfaceAsc`
+  };
+
+  return sortRoutes[sort] || `${API_BASE}/appartements`;
+}
+
+function getSortComparator(sort) {
+  const comparators = {
+    "price-desc": (a, b) => (b.price || 0) - (a.price || 0),
+    "price-asc": (a, b) => (a.price || 0) - (b.price || 0),
+    "surface-desc": (a, b) => (b.surface || 0) - (a.surface || 0),
+    "surface-asc": (a, b) => (a.surface || 0) - (b.surface || 0)
+  };
+
+  return comparators[sort] || (() => 0);
 }
 
 window.onload = () => {
+  cursorGlow = document.getElementById("cursor-glow");
+  document.addEventListener("pointermove", handlePointerMove);
+  document.addEventListener("pointerleave", handlePointerLeave);
   fetchListings();
 };
+
+function handlePointerMove(event) {
+  if (!cursorGlow) {
+    return;
+  }
+
+  cursorGlow.style.opacity = "1";
+  cursorGlow.style.left = `${event.clientX}px`;
+  cursorGlow.style.top = `${event.clientY}px`;
+}
+
+function handlePointerLeave() {
+  if (!cursorGlow) {
+    return;
+  }
+
+  cursorGlow.style.opacity = "0";
+}

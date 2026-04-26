@@ -3,112 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DarStay - Location & Voyage</title>
+  <title>DarStay - Sejour & Reservation</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-[#09090b] text-slate-100 font-sans">
-  <nav class="bg-[#111114]/95 shadow-sm sticky top-0 z-50 border-b border-white/10 backdrop-blur">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-4xl">Home</span>
-        <h1 class="text-3xl font-bold text-orange-400">DarStay</h1>
+<body class="page-shell">
+  <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
+  <div class="ambient ambient-left"></div>
+  <div class="ambient ambient-right"></div>
+
+  <nav class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">DS</div>
+        <div>
+          <p class="brand-kicker">Stay Curated</p>
+          <h1 class="brand-title">DarStay</h1>
+        </div>
       </div>
 
-      <div class="flex items-center gap-8 text-lg">
-        <a href="#" onclick="switchTab(0, event)" class="tab-link tab-active font-medium">Logements</a>
-        <a href="#" onclick="switchTab(1, event)" class="tab-link font-medium hover:text-orange-300">Restaurants</a>
-        <a href="#" onclick="switchTab(2, event)" class="tab-link font-medium hover:text-orange-300">Transport</a>
-        <a href="#" onclick="switchTab(3, event)" class="tab-link font-medium hover:text-orange-300">Planning</a>
+      <div class="topbar-links">
+        <a href="#" onclick="switchTab(0, event)" class="tab-link tab-active">Logements</a>
+        <a href="#" onclick="switchTab(1, event)" class="tab-link">Restaurants</a>
+        <a href="#" onclick="switchTab(2, event)" class="tab-link">Transport</a>
+        <a href="#" onclick="switchTab(3, event)" class="tab-link">Planning</a>
       </div>
 
-      <div class="flex items-center gap-4">
-        <button class="px-6 py-2 border rounded-3xl font-medium">Devenir hote</button>
-        <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-3xl cursor-pointer">
-          <i class="fas fa-user-circle text-2xl"></i>
-          <span class="font-medium">Yanis</span>
+      <div class="topbar-actions">
+        <button class="host-button">Devenir hote</button>
+        <div class="profile-chip">
+          <i class="fas fa-user-circle"></i>
+          <span>Yanis</span>
         </div>
       </div>
     </div>
   </nav>
 
-  <section class="bg-[radial-gradient(circle_at_top,_rgba(251,146,60,0.35),_rgba(9,9,11,0.96)_50%,_#09090b_100%)] text-white py-20">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="hero-shell">
+  <main>
+    <section class="hero">
+      <div class="hero-grid">
         <div class="hero-copy">
-          <div class="hero-pill">
-            <span class="hero-pill-dot"></span>
-            Voyage, logement, planning
-          </div>
-          <h1 class="text-6xl font-bold">Ton sejour parfait commence ici</h1>
-          <p class="hero-lead">DarStay rassemble logements, contact rapide et organisation du sejour dans une interface plus nette et plus simple a parcourir.</p>
+          <p class="eyebrow">Collection hiver 2026</p>
+          <h2 class="hero-title">Le sejour prend enfin une vraie allure.</h2>
+          <p class="hero-text">Des appartements, un parcours de reservation lisible, et un univers plus premium pour donner envie de parcourir les offres au lieu de juste les consulter.</p>
 
-          <div class="hero-stats">
-            <div class="hero-stat">
+          <div class="hero-metrics">
+            <div class="metric-card">
               <strong>+120</strong>
               <span>adresses a comparer</span>
             </div>
-            <div class="hero-stat">
-              <strong>48h</strong>
-              <span>pour choisir sans stress</span>
+            <div class="metric-card">
+              <strong>24/7</strong>
+              <span>navigation simple et rapide</span>
             </div>
-            <div class="hero-stat">
-              <strong>1 plan</strong>
-              <span>pour centraliser le voyage</span>
+            <div class="metric-card">
+              <strong>1 espace</strong>
+              <span>pour reserver et organiser</span>
             </div>
           </div>
         </div>
 
-        <div class="hero-panel bg-[#111114]/90 text-white rounded-3xl p-3 shadow-2xl border border-white/10 backdrop-blur">
-          <div class="hero-search-row">
-            <input id="search" type="text" placeholder="Ou allez-vous ? (Alger, Oran...)"
-                   class="flex-1 px-8 py-6 outline-none text-lg rounded-3xl bg-[#18181b] text-slate-100 placeholder:text-slate-500">
-            <button onclick="searchAll()"
-                    class="bg-orange-500 text-white px-12 py-6 rounded-3xl font-semibold flex items-center gap-3 text-xl shadow-[0_20px_50px_rgba(249,115,22,0.28)]">
-              <i class="fas fa-search"></i> Rechercher
-            </button>
+        <div class="hero-stage">
+          <div class="search-panel">
+            <p class="search-kicker">Trouver le bon point de chute</p>
+            <div class="search-row">
+              <input id="search" type="text" placeholder="Ou allez-vous ? Alger, Oran, Sousse..."
+                     class="search-input">
+              <button onclick="searchAll()" class="search-button">
+                <i class="fas fa-search"></i>
+                <span>Rechercher</span>
+              </button>
+            </div>
+            <div class="search-actions">
+              <button onclick="findClosestAppartements()" class="nearby-button">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Pres de moi</span>
+              </button>
+              <span class="search-hint">Active la geolocalisation pour voir les logements les plus proches.</span>
+            </div>
+            <div class="search-tags">
+              <span>Appartements verifies</span>
+              <span>Reservation guidee</span>
+              <span>Contact rapide</span>
+            </div>
           </div>
-          <div class="hero-highlights">
-            <span>Appartements verifies</span>
-            <span>Contact rapide avec l'hote</span>
-            <span>Reservation guidee</span>
+
+          <div class="hero-preview">
+            <div class="preview-card preview-primary">
+              <p class="preview-label">Escapade bord de mer</p>
+              <h3>Selection qui donne envie de reserver vite.</h3>
+              <span>Design plus net, lecture plus fluide, CTA plus present.</span>
+            </div>
+            <div class="preview-card preview-secondary">
+              <p class="preview-small">Parcours client</p>
+              <strong>Login / Register en popup</strong>
+              <span>Ouverture au clic sur Reserver</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="max-w-7xl mx-auto px-6 py-12">
-    <div id="tab-0" class="tab-content">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">Selection du moment</p>
-          <h2 class="text-4xl font-semibold">Logements disponibles</h2>
+    <section class="content-shell">
+      <div id="tab-0" class="tab-content">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Selection en direct</p>
+            <h2 class="section-title">Logements disponibles</h2>
+          </div>
+          <div id="listing-summary" class="listing-summary">Chargement...</div>
         </div>
-        <div id="listing-summary" class="listing-summary">Chargement...</div>
+        <div class="filter-bar">
+          <select id="filter-type" class="filter-input">
+            <option value="">Type</option>
+            <option value="rent">Rent</option>
+            <option value="sale">Sale</option>
+          </select>
+          <input id="filter-min-price" class="filter-input" type="number" min="0" placeholder="Prix min">
+          <input id="filter-max-price" class="filter-input" type="number" min="0" placeholder="Prix max">
+          <input id="filter-min-surface" class="filter-input" type="number" min="0" placeholder="Surface min">
+          <input id="filter-max-surface" class="filter-input" type="number" min="0" placeholder="Surface max">
+          <select id="filter-sort" class="filter-input">
+            <option value="">Trier par</option>
+            <option value="price-desc">Prix decroissant</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="surface-desc">Surface decroissante</option>
+            <option value="surface-asc">Surface croissante</option>
+          </select>
+          <button class="filter-button" onclick="applyFilters()">Appliquer</button>
+          <button class="filter-button filter-button-secondary" onclick="resetFilters()">Reset</button>
+        </div>
+        <div id="listings" class="listing-grid"></div>
       </div>
-      <div id="listings" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
-    </div>
 
-    <div id="tab-1" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">Restaurants</h2>
-      <div id="restaurants" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
-    </div>
-
-    <div id="tab-2" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">Transport</h2>
-      <div id="transport" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
-    </div>
-
-    <div id="tab-3" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">Mon Planning</h2>
-      <div class="planning-card p-8 rounded-3xl text-center text-xl">
-        <p class="mb-6">Ton planning de sejour sera ici avec les etapes, logements reserves et infos pratiques.</p>
-        <button class="bg-[#c2410f] text-white px-10 py-4 rounded-3xl">Creer un planning</button>
+      <div id="tab-1" class="tab-content hidden">
+        <div class="empty-state">
+          <p class="section-kicker">A venir</p>
+          <h2 class="section-title">Restaurants</h2>
+          <p>Cette section suivra la meme logique visuelle avec une vraie selection a parcourir.</p>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <div id="tab-2" class="tab-content hidden">
+        <div class="empty-state">
+          <p class="section-kicker">A venir</p>
+          <h2 class="section-title">Transport</h2>
+          <p>Le transport aura sa propre mise en scene avec cartes, prix et disponibilites.</p>
+        </div>
+      </div>
+
+      <div id="tab-3" class="tab-content hidden">
+        <div class="planning-card">
+          <p class="section-kicker">Organisation</p>
+          <h2 class="section-title">Mon Planning</h2>
+          <p>Ton planning de sejour sera ici avec les logements retenus, les etapes et les details pratiques.</p>
+          <button class="planning-button">Creer un planning</button>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
     <div class="auth-backdrop" onclick="closeAuthModal()"></div>

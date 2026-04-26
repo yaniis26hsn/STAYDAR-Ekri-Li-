@@ -85,8 +85,11 @@ export const betweenRating = async (req , res)=>{
 } ;
 
 export const getByTown = async (req, res) => {
-    
-    const apps = await Appartement.find({ town: req.params.town });
+    const town = req.params.town.trim();
+    const escapedTown = town.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const apps = await Appartement.find({
+        town: { $regex: `^${escapedTown}$`, $options: 'i' }
+    });
     res.send(apps);
 
 };
@@ -148,8 +151,14 @@ export const search = async (req, res) => {
 
     let query = {} ;
 
-    if (type) query.type = type ;
-    if (town) query.town = town ;
+    if (type) {
+      const escapedType = type.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.type = { $regex: `^${escapedType}$`, $options: 'i' } ;
+    }
+    if (town) {
+      const escapedTown = town.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.town = { $regex: `^${escapedTown}$`, $options: 'i' } ;
+    }
     if (minPrice || maxPrice) query.price = {} ;
     if (minPrice) query.price.$gte = Number(minPrice) ;
     if (maxPrice) query.price.$lte = Number(maxPrice) ;
