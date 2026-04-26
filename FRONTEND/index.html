@@ -3,30 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DarStay - Location & Voyage en Algérie</title>
+  <title>DarStay - Location & Voyage</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 font-sans">
-
-  <!-- Navbar -->
-  <nav class="bg-white shadow-sm sticky top-0 z-50">
+<body class="bg-[#09090b] text-slate-100 font-sans">
+  <nav class="bg-[#111114]/95 shadow-sm sticky top-0 z-50 border-b border-white/10 backdrop-blur">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span class="text-4xl">🏠</span>
-        <h1 class="text-3xl font-bold text-[#c2410f]">DarStay</h1>
+        <span class="text-4xl">Home</span>
+        <h1 class="text-3xl font-bold text-orange-400">DarStay</h1>
       </div>
 
       <div class="flex items-center gap-8 text-lg">
         <a href="#" onclick="switchTab(0, event)" class="tab-link tab-active font-medium">Logements</a>
-        <a href="#" onclick="switchTab(1, event)" class="tab-link font-medium hover:text-[#c2410f]">Restaurants</a>
-        <a href="#" onclick="switchTab(2, event)" class="tab-link font-medium hover:text-[#c2410f]">Transport</a>
-        <a href="#" onclick="switchTab(3, event)" class="tab-link font-medium hover:text-[#c2410f]">Planning</a>
+        <a href="#" onclick="switchTab(1, event)" class="tab-link font-medium hover:text-orange-300">Restaurants</a>
+        <a href="#" onclick="switchTab(2, event)" class="tab-link font-medium hover:text-orange-300">Transport</a>
+        <a href="#" onclick="switchTab(3, event)" class="tab-link font-medium hover:text-orange-300">Planning</a>
       </div>
 
       <div class="flex items-center gap-4">
-        <button class="px-6 py-2 border rounded-3xl font-medium">Devenir hôte</button>
+        <button class="px-6 py-2 border rounded-3xl font-medium">Devenir hote</button>
         <div class="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-3xl cursor-pointer">
           <i class="fas fa-user-circle text-2xl"></i>
           <span class="font-medium">Yanis</span>
@@ -35,53 +33,140 @@
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section class="bg-gradient-to-r from-[#c2410f] to-orange-600 text-white py-20">
-    <div class="max-w-7xl mx-auto px-6 text-center">
-      <h1 class="text-6xl font-bold mb-4">Ton séjour parfait en Algérie commence ici</h1>
-      <p class="text-2xl mb-10">Logements • Restaurants • Transport • Planning</p>
+  <section class="bg-[radial-gradient(circle_at_top,_rgba(251,146,60,0.35),_rgba(9,9,11,0.96)_50%,_#09090b_100%)] text-white py-20">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="hero-shell">
+        <div class="hero-copy">
+          <div class="hero-pill">
+            <span class="hero-pill-dot"></span>
+            Voyage, logement, planning
+          </div>
+          <h1 class="text-6xl font-bold">Ton sejour parfait commence ici</h1>
+          <p class="hero-lead">DarStay rassemble logements, contact rapide et organisation du sejour dans une interface plus nette et plus simple a parcourir.</p>
 
-      <div class="max-w-4xl mx-auto bg-white text-black rounded-3xl p-3 shadow-2xl">
-        <div class="flex gap-4">
-          <input id="search" type="text" placeholder="Où allez-vous ? (Alger, Oran...)"
-                 class="flex-1 px-8 py-6 outline-none text-lg rounded-3xl">
-          <button onclick="searchAll()"
-                  class="bg-[#c2410f] text-white px-12 py-6 rounded-3xl font-semibold flex items-center gap-3 text-xl">
-            <i class="fas fa-search"></i> Rechercher
-          </button>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <strong>+120</strong>
+              <span>adresses a comparer</span>
+            </div>
+            <div class="hero-stat">
+              <strong>48h</strong>
+              <span>pour choisir sans stress</span>
+            </div>
+            <div class="hero-stat">
+              <strong>1 plan</strong>
+              <span>pour centraliser le voyage</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel bg-[#111114]/90 text-white rounded-3xl p-3 shadow-2xl border border-white/10 backdrop-blur">
+          <div class="hero-search-row">
+            <input id="search" type="text" placeholder="Ou allez-vous ? (Alger, Oran...)"
+                   class="flex-1 px-8 py-6 outline-none text-lg rounded-3xl bg-[#18181b] text-slate-100 placeholder:text-slate-500">
+            <button onclick="searchAll()"
+                    class="bg-orange-500 text-white px-12 py-6 rounded-3xl font-semibold flex items-center gap-3 text-xl shadow-[0_20px_50px_rgba(249,115,22,0.28)]">
+              <i class="fas fa-search"></i> Rechercher
+            </button>
+          </div>
+          <div class="hero-highlights">
+            <span>Appartements verifies</span>
+            <span>Contact rapide avec l'hote</span>
+            <span>Reservation guidee</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Tabs Content -->
   <div class="max-w-7xl mx-auto px-6 py-12">
-
-    <!-- Logements -->
     <div id="tab-0" class="tab-content">
-      <h2 class="text-4xl font-semibold mb-8">🏡 Logements disponibles</h2>
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Selection du moment</p>
+          <h2 class="text-4xl font-semibold">Logements disponibles</h2>
+        </div>
+        <div id="listing-summary" class="listing-summary">Chargement...</div>
+      </div>
       <div id="listings" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- Restaurants -->
     <div id="tab-1" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">🍽️ Restaurants</h2>
+      <h2 class="text-4xl font-semibold mb-8">Restaurants</h2>
       <div id="restaurants" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- Transport -->
     <div id="tab-2" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">🚗 Transport</h2>
+      <h2 class="text-4xl font-semibold mb-8">Transport</h2>
       <div id="transport" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- Planning -->
     <div id="tab-3" class="tab-content hidden">
-      <h2 class="text-4xl font-semibold mb-8">📅 Mon Planning</h2>
-      <div class="bg-white p-8 rounded-3xl text-center text-xl">
-        <p class="mb-6">Ton planning de séjour sera ici</p>
-        <button class="bg-[#c2410f] text-white px-10 py-4 rounded-3xl">Créer un planning</button>
+      <h2 class="text-4xl font-semibold mb-8">Mon Planning</h2>
+      <div class="planning-card p-8 rounded-3xl text-center text-xl">
+        <p class="mb-6">Ton planning de sejour sera ici avec les etapes, logements reserves et infos pratiques.</p>
+        <button class="bg-[#c2410f] text-white px-10 py-4 rounded-3xl">Creer un planning</button>
       </div>
+    </div>
+  </div>
+
+  <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
+    <div class="auth-backdrop" onclick="closeAuthModal()"></div>
+    <div class="auth-panel">
+      <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="auth-copy">
+        <p class="auth-kicker">Reservation</p>
+        <h3>Connecte-toi pour continuer</h3>
+        <p id="auth-modal-subtitle">Identifie-toi ou cree un compte pour reserver ce logement.</p>
+      </div>
+      <div class="auth-tabs">
+        <button id="login-tab" type="button" class="auth-tab auth-tab-active" onclick="setAuthMode('login')">Login</button>
+        <button id="register-tab" type="button" class="auth-tab" onclick="setAuthMode('register')">Register</button>
+      </div>
+
+      <form id="login-form" class="auth-form" onsubmit="submitAuth(event, 'login')">
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="Your password" required>
+        </label>
+        <button type="submit" class="auth-submit">Login</button>
+      </form>
+
+      <form id="register-form" class="auth-form hidden" onsubmit="submitAuth(event, 'register')">
+        <label>
+          <span>First name</span>
+          <input type="text" name="fname" placeholder="Yanis" required>
+        </label>
+        <label>
+          <span>Last name</span>
+          <input type="text" name="lname" placeholder="Ben Ali" required>
+        </label>
+        <label>
+          <span>Username</span>
+          <input type="text" name="username" placeholder="yanisdz" required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="you@example.com" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="Choose a password" required>
+        </label>
+        <label>
+          <span>Phone</span>
+          <input type="text" name="phone" placeholder="+213 555 000 000">
+        </label>
+        <button type="submit" class="auth-submit">Create account</button>
+      </form>
+
+      <p id="auth-feedback" class="auth-feedback hidden"></p>
     </div>
   </div>
 
