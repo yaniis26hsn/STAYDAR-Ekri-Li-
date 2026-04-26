@@ -5,7 +5,7 @@ import {
 } from '../controllers/authen.js'
 const router = express.Router() ;
 
-router.get('/login', login) ;
+router.post('/login', login) ;
 router.post('/register', register);
 
 export default router ;

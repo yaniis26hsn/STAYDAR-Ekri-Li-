@@ -22,11 +22,11 @@ const UserSchema = new mongoose.Schema({
 
   password : String , // hashed pwd 
 
-  rating : {type :Number,default: null} , // the average of the ratings of his properties 
+  rating : {type :Number,default: null } , // the average of the ratings of his properties 
   // when it is null , in the ui we show 'not rated yet' 
 
   email : {
-    type : String ,
+    type : String , unique :true ,
     required : [true , 'user must provide an email'] ,
     maxlength : [35 , 'the length is limited to 35']
   } ,

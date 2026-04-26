@@ -10,7 +10,7 @@ getUserRating
 
 const router = express.Router() ;
 
-router.post('/user', createUser) 
+
 router.delete('/user/:id' , deleteUser)
 router.get('/user' , getUsers)
 
