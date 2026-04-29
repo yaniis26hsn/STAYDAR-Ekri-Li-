@@ -1,5 +1,10 @@
 import bcrypt from 'bcrypt'
 import User from '../models/User.js';
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+dotenv.config()
+ const SECRET = process.env.JWT_SECRET;
+
 
 export const register = async (req,res)=>{
   try{
@@ -22,15 +27,20 @@ export const register = async (req,res)=>{
 }
   export const login = async (req,res)=>{
     try{
-     const data = req.body ;    
-        const user = await User.findOne({ email: data.email});
+     const {email , password} = req.body ;    
+     if(!email || !password) return res.status(400).send("mising fields")
+        const user = await User.findOne({ email: email});
         if(!user) return res.status(400).send("wrong credintials") ;
 
-        const passwordMatch = await bcrypt.compare(data.password ,user.password ) ;
+        const passwordMatch = await bcrypt.compare(password ,user.password ) ;
         
         if(passwordMatch){
-            res.send("successful login") ;
-         // TODO : use JWT 
+            const token = jwt.sign(
+               { userId: user.id },
+               SECRET ,
+               {expiresIn : "1h"}
+            )
+            res.json({token}) ;
         }else{
              return res.status(400).send("wrong credintials") ;
            // using the same message for all (non server side) errors will be more secure , the attacker won't know the source of the error
