@@ -8,15 +8,35 @@ dotenv.config()
 
 export const register = async (req,res)=>{
   try{
-    const data = req.body ;    
-        const user = await User.findOne({ email: data.email});
+    const {
+  email,
+  thePassword,
+  fname,
+  lname,
+  username,
+  address,
+  town,
+  phone,
+  contact
+} = req.body;  
+        const user = await User.findOne({ email: email});
         if(user) return res.status(400).send("wrong credintials") ;
         // TODO in front end : suggesting the user to login instead or for security just say error
         // to make sure that no one will know if a email is using the website(for more security)
 
-       data.password = await bcrypt.hash(data.password,10) ;
-       data.rating = null ;  // the default value of the rating should be null 
-    const newUser = new User(data) ;
+     const password = await bcrypt.hash(thePassword,10) ;
+       // the default value of the rating should be null 
+    const newUser = new User({
+  email,
+  password,
+  fname,
+  lname,
+  username,
+  address,
+  town,
+  phone,
+  contact
+}) ;
     await newUser.save() ;
     res.status(201).send("the user was successfully added ") ;
     
@@ -30,7 +50,7 @@ export const register = async (req,res)=>{
      const {email , password} = req.body ;    
      if(!email || !password) return res.status(400).send("mising fields")
         const user = await User.findOne({ email: email});
-        if(!user) return res.status(400).send("wrong credintials") ;
+        if(!user) return res.status(401).send("wrong credintials") ;
 
         const passwordMatch = await bcrypt.compare(password ,user.password ) ;
         
@@ -42,7 +62,7 @@ export const register = async (req,res)=>{
             )
             res.json({token}) ;
         }else{
-             return res.status(400).send("wrong credintials") ;
+             return res.status(401).send("wrong credintials") ;
            // using the same message for all (non server side) errors will be more secure , the attacker won't know the source of the error
         }
 
@@ -51,3 +71,14 @@ export const register = async (req,res)=>{
     }
   
 }
+export const googleAuthCallback = (req, res) => {
+    // Passport attaches the user found/created in the config to req.user
+    const token = jwt.sign(
+        { userId: req.user.id },
+        SECRET,
+        { expiresIn: "1h" }
+    );
+
+    // Redirect the user back to the frontend with the token
+    res.redirect(`http://localhost:4000?token=${token}`);
+};

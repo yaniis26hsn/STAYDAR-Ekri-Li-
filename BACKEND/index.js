@@ -4,7 +4,11 @@ import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import appartementRouter from './routes/appartement.js'
 import userRouter from './routes/user.js'
-import authRouter from './routes/authen.js'
+import authRouter from './routes/authn.js'
+import passport from 'passport';
+
+import './config/passport.js'; // importing it so it executes
+
 
 dotenv.config()
 
@@ -16,7 +20,7 @@ app.use(express.json());
 app.use('/api/v1', appartementRouter) ;
 app.use('/api/v1', userRouter) ;
 app.use('/api/v1',authRouter) ;
-
+app.use(passport.initialize());
 const startServer = async () => {
   try {
     if (!process.env.MONGO_URI) {
