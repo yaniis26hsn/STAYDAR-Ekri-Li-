@@ -1,7 +1,10 @@
 import express from 'express'
+import passport from 'passport'
+
 import { 
     register ,
-    login
+    login,
+    googleAuthCallback
 } from '../controllers/authn.js'
 const router = express.Router() ;
 

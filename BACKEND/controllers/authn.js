@@ -10,7 +10,7 @@ export const register = async (req,res)=>{
   try{
     const {
   email,
-  thePassword,
+  password: plainPwd,
   fname,
   lname,
   username,
@@ -24,11 +24,11 @@ export const register = async (req,res)=>{
         // TODO in front end : suggesting the user to login instead or for security just say error
         // to make sure that no one will know if a email is using the website(for more security)
 
-     const password = await bcrypt.hash(thePassword,10) ;
+     const hashedPwd = await bcrypt.hash(plainPwd,10) ;
        // the default value of the rating should be null 
     const newUser = new User({
   email,
-  password,
+  password:hashedPwd,
   fname,
   lname,
   username,
@@ -79,6 +79,7 @@ export const googleAuthCallback = (req, res) => {
         { expiresIn: "1h" }
     );
 
-    // Redirect the user back to the frontend with the token
-    res.redirect(`http://localhost:4000?token=${token}`);
+    // Use the URL fragment so the token is not sent back to servers in the query string.
+    res.redirect(`${process.env.FRONTEND_URL}#token=${token}`);
 };
+

@@ -15,16 +15,33 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 4000 ;
 // middlewares
-app.use(cors());
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL
+}));
+app.use(passport.initialize());
 app.use(express.json());
+
+// routes
 app.use('/api/v1', appartementRouter) ;
 app.use('/api/v1', userRouter) ;
 app.use('/api/v1',authRouter) ;
-app.use(passport.initialize());
+
 const startServer = async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI is missing')
+    const requiredEnvVars = [
+      'MONGO_URI',
+      'JWT_SECRET',
+      'GOOGLE_CLIENT_ID',
+      'GOOGLE_CLIENT_SECRET',
+      'GOOGLE_CALLBACK_URL',
+      'FRONTEND_URL'
+    ]
+
+    for (const envVar of requiredEnvVars) {
+      if (!process.env[envVar]) {
+        throw new Error(`${envVar} is missing`)
+      }
     }
 
     await mongoose.connect(process.env.MONGO_URI)

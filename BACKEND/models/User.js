@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
   username : {
     type : String ,
     trim : true ,
-     maxlength : [35 , 'the length is limited to 35']
+     maxlength : [50 , 'the length is limited to 50']
   } ,
 
   provider: {
@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema({
      trim : true ,
      lowercase : true ,
     required : [true , 'user must provide an email'] ,
-    maxlength : [35 , 'the length is limited to 35']
+    maxlength : [50 , 'the length is limited to 50']
   } ,
   phone :  {
     type : String ,

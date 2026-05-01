@@ -1,9 +1,40 @@
-const API_BASE = "http://localhost:4000/api/v1";
+const API_BASE = "https://staydar-api.onrender.com/api/v1";
 const CLOSE_RADIUS_KM = 15;
+const TOKEN_STORAGE_KEY = "staydar_token";
 let appartements = [];
 let displayedAppartements = [];
 let selectedReservation = null;
 let cursorGlow = null;
+
+function startGoogleAuth() {
+  window.location.href = `${API_BASE}/google`;
+}
+
+function handleOAuthRedirect() {
+  const hash = window.location.hash.startsWith("#")
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+  const params = new URLSearchParams(hash);
+  const token = params.get("token");
+
+  if (!token) {
+    return;
+  }
+
+  localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  window.history.replaceState(null, "", window.location.pathname + window.location.search);
+
+  const feedback = document.getElementById("auth-feedback");
+  if (feedback) {
+    feedback.className = "auth-feedback auth-feedback-success";
+    feedback.textContent = "Connexion Google reussie.";
+  }
+
+  const modal = document.getElementById("auth-modal");
+  if (modal && !modal.classList.contains("hidden")) {
+    closeAuthModal();
+  }
+}
 
 async function fetchListings() {
   const container = document.getElementById("listings");
@@ -113,6 +144,21 @@ function openAuthModal(id, title) {
   clearAuthFeedback();
 }
 
+function openAuthEntry(mode = "login") {
+  selectedReservation = null;
+  const modal = document.getElementById("auth-modal");
+  const subtitle = document.getElementById("auth-modal-subtitle");
+
+  subtitle.textContent = mode === "register"
+    ? "Cree ton compte StayDAR pour retrouver tes logements, ton token et tes prochaines reservations."
+    : "Connecte-toi a ton espace StayDAR pour reprendre ton parcours, meme sans lancer une reservation.";
+
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  setAuthMode(mode);
+  clearAuthFeedback();
+}
+
 function closeAuthModal() {
   document.getElementById("auth-modal").classList.add("hidden");
   document.body.classList.remove("modal-open");
@@ -155,13 +201,20 @@ async function submitAuth(event, mode) {
       },
       body: JSON.stringify(payload)
     });
-
-    const message = await res.text();
+    const responseBody = res.headers.get("content-type")?.includes("application/json")
+      ? await res.json()
+      : await res.text();
 
     if (!res.ok) {
       feedback.className = "auth-feedback auth-feedback-error";
-      feedback.textContent = message || "Une erreur est survenue.";
+      feedback.textContent = typeof responseBody === "string"
+        ? responseBody
+        : responseBody?.error || "Une erreur est survenue.";
       return;
+    }
+
+    if (mode === "login" && responseBody?.token) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, responseBody.token);
     }
 
     feedback.className = "auth-feedback auth-feedback-success";
@@ -352,6 +405,7 @@ window.onload = () => {
   cursorGlow = document.getElementById("cursor-glow");
   document.addEventListener("pointermove", handlePointerMove);
   document.addEventListener("pointerleave", handlePointerLeave);
+  handleOAuthRedirect();
   fetchListings();
 };
 

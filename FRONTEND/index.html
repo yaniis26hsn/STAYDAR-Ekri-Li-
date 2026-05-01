@@ -35,10 +35,10 @@
 
       <div class="topbar-actions">
         <button class="host-button">Devenir hote</button>
-        <div class="profile-chip">
+        <button type="button" class="profile-chip" onclick="openAuthEntry()">
           <i class="fas fa-user-circle"></i>
-          <span>Yanis</span>
-        </div>
+          <span>Connexion</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -64,6 +64,17 @@
               <strong>1 espace</strong>
               <span>pour reserver et organiser</span>
             </div>
+          </div>
+
+          <div class="hero-auth-actions">
+            <button type="button" class="search-button hero-auth-button" onclick="openAuthEntry('login')">
+              <i class="fas fa-arrow-right-to-bracket"></i>
+              <span>Se connecter</span>
+            </button>
+            <button type="button" class="hero-auth-secondary" onclick="openAuthEntry('register')">
+              <i class="fas fa-user-plus"></i>
+              <span>Creer un compte</span>
+            </button>
           </div>
         </div>
 
@@ -118,24 +129,44 @@
           <div id="listing-summary" class="listing-summary">Chargement...</div>
         </div>
         <div class="filter-bar">
-          <select id="filter-type" class="filter-input">
-            <option value="">Type</option>
-            <option value="rent">Rent</option>
-            <option value="sale">Sale</option>
-          </select>
-          <input id="filter-min-price" class="filter-input" type="number" min="0" placeholder="Prix min">
-          <input id="filter-max-price" class="filter-input" type="number" min="0" placeholder="Prix max">
-          <input id="filter-min-surface" class="filter-input" type="number" min="0" placeholder="Surface min">
-          <input id="filter-max-surface" class="filter-input" type="number" min="0" placeholder="Surface max">
-          <select id="filter-sort" class="filter-input">
-            <option value="">Trier par</option>
-            <option value="price-desc">Prix decroissant</option>
-            <option value="price-asc">Prix croissant</option>
-            <option value="surface-desc">Surface decroissante</option>
-            <option value="surface-asc">Surface croissante</option>
-          </select>
-          <button class="filter-button" onclick="applyFilters()">Appliquer</button>
-          <button class="filter-button filter-button-secondary" onclick="resetFilters()">Reset</button>
+          <div class="filter-field">
+            <span class="filter-label">Type</span>
+            <select id="filter-type" class="filter-input">
+              <option value="">Choisir</option>
+              <option value="rent">Rent</option>
+              <option value="sale">Sale</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Prix min</span>
+            <input id="filter-min-price" class="filter-input filter-input-number" type="number" min="0" placeholder="0">
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Prix max</span>
+            <input id="filter-max-price" class="filter-input filter-input-number" type="number" min="0" placeholder="25000">
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Surface min</span>
+            <input id="filter-min-surface" class="filter-input filter-input-number" type="number" min="0" placeholder="0">
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Surface max</span>
+            <input id="filter-max-surface" class="filter-input filter-input-number" type="number" min="0" placeholder="160">
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Tri</span>
+            <select id="filter-sort" class="filter-input">
+              <option value="">Aucun</option>
+              <option value="price-desc">Prix decroissant</option>
+              <option value="price-asc">Prix croissant</option>
+              <option value="surface-desc">Surface decroissante</option>
+              <option value="surface-asc">Surface croissante</option>
+            </select>
+          </div>
+          <div class="filter-actions">
+            <button class="filter-button" onclick="applyFilters()">Appliquer</button>
+            <button class="filter-button filter-button-secondary" onclick="resetFilters()">Reset</button>
+          </div>
         </div>
         <div id="listings" class="listing-grid"></div>
       </div>
@@ -173,57 +204,104 @@
       <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Fermer">
         <i class="fas fa-times"></i>
       </button>
-      <div class="auth-copy">
-        <p class="auth-kicker">Reservation</p>
-        <h3>Connecte-toi pour continuer</h3>
-        <p id="auth-modal-subtitle">Identifie-toi ou cree un compte pour reserver ce logement.</p>
+      <div class="auth-shell">
+        <aside class="auth-aside">
+          <p class="auth-kicker">Reservation</p>
+          <h3>Connecte-toi pour finaliser ton sejour.</h3>
+          <p id="auth-modal-subtitle" class="auth-lead">Identifie-toi ou cree un compte pour reserver ce logement.</p>
+          <div class="auth-benefits">
+            <div class="auth-benefit-card">
+              <span class="auth-benefit-icon"><i class="fas fa-bolt"></i></span>
+              <div>
+                <strong>Reservation plus rapide</strong>
+                <span>Retrouve ton token, tes infos et tes futures actions au meme endroit.</span>
+              </div>
+            </div>
+            <div class="auth-benefit-card">
+              <span class="auth-benefit-icon"><i class="fas fa-shield-heart"></i></span>
+              <div>
+                <strong>Acces plus propre</strong>
+                <span>Login classique ou Google selon le chemin le plus simple pour toi.</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth-aside-footer">
+            <span><i class="fas fa-check-circle"></i> Acces securise</span>
+            <span><i class="fas fa-moon"></i> Parcours premium</span>
+          </div>
+        </aside>
+        <div class="auth-main">
+          <div class="auth-header-row">
+            <div class="auth-copy">
+              <p class="auth-kicker">Espace client</p>
+              <h4>Reprends ton parcours sans friction.</h4>
+            </div>
+            <div class="auth-status-pill">StayDAR Access</div>
+          </div>
+          <div class="auth-tabs">
+            <button id="login-tab" type="button" class="auth-tab auth-tab-active" onclick="setAuthMode('login')">Login</button>
+            <button id="register-tab" type="button" class="auth-tab" onclick="setAuthMode('register')">Register</button>
+          </div>
+
+          <form id="login-form" class="auth-form" onsubmit="submitAuth(event, 'login')">
+            <button type="button" class="auth-social" onclick="startGoogleAuth()">
+              <span class="auth-social-icon"><i class="fab fa-google"></i></span>
+              <span>Continuer avec Google</span>
+            </button>
+            <div class="auth-divider">
+              <span>ou utilise ton email</span>
+            </div>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" placeholder="you@example.com" required>
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" name="password" placeholder="Your password" required>
+            </label>
+            <div class="auth-row">
+              <label class="auth-check">
+                <input type="checkbox" checked>
+                <span>Garder ma session</span>
+              </label>
+              <button type="button" class="auth-link-button">Besoin d'aide ?</button>
+            </div>
+            <button type="submit" class="auth-submit">Login</button>
+          </form>
+
+          <form id="register-form" class="auth-form hidden" onsubmit="submitAuth(event, 'register')">
+            <div class="auth-form-grid">
+              <label>
+                <span>First name</span>
+                <input type="text" name="fname" placeholder="Yanis" required>
+              </label>
+              <label>
+                <span>Last name</span>
+                <input type="text" name="lname" placeholder="Ben Ali" required>
+              </label>
+            </div>
+            <label>
+              <span>Username</span>
+              <input type="text" name="username" placeholder="yanisdz" required>
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" placeholder="you@example.com" required>
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" name="password" placeholder="Choose a password" required>
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="text" name="phone" placeholder="+213 555 000 000">
+            </label>
+            <button type="submit" class="auth-submit">Create account</button>
+          </form>
+
+          <p id="auth-feedback" class="auth-feedback hidden"></p>
+        </div>
       </div>
-      <div class="auth-tabs">
-        <button id="login-tab" type="button" class="auth-tab auth-tab-active" onclick="setAuthMode('login')">Login</button>
-        <button id="register-tab" type="button" class="auth-tab" onclick="setAuthMode('register')">Register</button>
-      </div>
-
-      <form id="login-form" class="auth-form" onsubmit="submitAuth(event, 'login')">
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
-        <label>
-          <span>Password</span>
-          <input type="password" name="password" placeholder="Your password" required>
-        </label>
-        <button type="submit" class="auth-submit">Login</button>
-      </form>
-
-      <form id="register-form" class="auth-form hidden" onsubmit="submitAuth(event, 'register')">
-        <label>
-          <span>First name</span>
-          <input type="text" name="fname" placeholder="Yanis" required>
-        </label>
-        <label>
-          <span>Last name</span>
-          <input type="text" name="lname" placeholder="Ben Ali" required>
-        </label>
-        <label>
-          <span>Username</span>
-          <input type="text" name="username" placeholder="yanisdz" required>
-        </label>
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
-        <label>
-          <span>Password</span>
-          <input type="password" name="password" placeholder="Choose a password" required>
-        </label>
-        <label>
-          <span>Phone</span>
-          <input type="text" name="phone" placeholder="+213 555 000 000">
-        </label>
-        <button type="submit" class="auth-submit">Create account</button>
-      </form>
-
-      <p id="auth-feedback" class="auth-feedback hidden"></p>
     </div>
   </div>
 

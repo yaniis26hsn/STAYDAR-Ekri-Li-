@@ -1,7 +1,5 @@
 import User from '../models/User.js';
 
-
-
 export const deleteUser = async (req,res)=>{
     await User.findByIdAndDelete(req.params.id) ;
     res.send("user was successfuly deleted") ;
