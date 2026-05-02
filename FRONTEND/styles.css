@@ -31,15 +31,15 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 42px;
-  height: 42px;
+  width: 120px;
+  height: 120px;
   border-radius: 999px;
   pointer-events: none;
   background: rgba(244, 124, 44, 0.14);
   box-shadow:
-    0 0 22px rgba(244, 124, 44, 0.22),
-    0 0 44px rgba(244, 124, 44, 0.12);
-  filter: blur(6px);
+    0 0 38px rgba(244, 124, 44, 0.22),
+    0 0 88px rgba(244, 124, 44, 0.12);
+  filter: blur(12px);
   transform: translate(-50%, -50%);
   z-index: 9999;
   opacity: 0;
