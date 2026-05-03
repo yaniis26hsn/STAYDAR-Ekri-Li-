@@ -79,6 +79,10 @@ function renderListings(data) {
     const price = typeof item.price === "number"
       ? `${item.price.toLocaleString("fr-DZ")} DA`
       : "Prix non renseigne";
+    const ratingValue = getAppartementRating(item);
+    const ratingText = ratingValue ? `${ratingValue.toFixed(1)} / 5` : "Pas encore note";
+    const ratingStars = getRatingStars(ratingValue);
+    const ratingCount = item.ratersNbr ? `${item.ratersNbr} avis` : "Aucun avis";
 
     return `
       <article class="card-hover listing-card">
@@ -100,6 +104,18 @@ function renderListings(data) {
           <div class="listing-meta">
             <span><i class="fas fa-location-dot"></i> ${town}</span>
             <span><i class="fas fa-bolt"></i> Disponible</span>
+          </div>
+          <div class="listing-rating">
+            <div>
+              <div class="listing-rating-stars">${ratingStars}</div>
+              <div class="listing-rating-copy">
+                <strong>${ratingText}</strong>
+                <span>${ratingCount}</span>
+              </div>
+            </div>
+            <button onclick="openRatingAuth('${item._id || ""}', '${escapeForAttribute(title)}')" class="listing-rate-button">
+              Noter
+            </button>
           </div>
           <p class="listing-description">${teaser}</p>
           <div class="listing-footer">
@@ -138,6 +154,18 @@ function openAuthModal(id, title) {
   const subtitle = document.getElementById("auth-modal-subtitle");
 
   subtitle.textContent = `Identifie-toi ou cree un compte pour reserver ${title}.`;
+  modal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  setAuthMode("login");
+  clearAuthFeedback();
+}
+
+function openRatingAuth(id, title) {
+  selectedReservation = { id, title, action: "rating" };
+  const modal = document.getElementById("auth-modal");
+  const subtitle = document.getElementById("auth-modal-subtitle");
+
+  subtitle.textContent = `Connecte-toi ou cree un compte pour noter ${title}.`;
   modal.classList.remove("hidden");
   document.body.classList.add("modal-open");
   setAuthMode("login");
@@ -399,6 +427,28 @@ function getSortComparator(sort) {
   };
 
   return comparators[sort] || (() => 0);
+}
+
+function getAppartementRating(item) {
+  const ratersNbr = Number(item?.ratersNbr);
+  const rateSum = Number(item?.rateSum);
+
+  if (!ratersNbr || !Number.isFinite(rateSum)) {
+    return 0;
+  }
+
+  return rateSum / ratersNbr;
+}
+
+function getRatingStars(value) {
+  if (!value) {
+    return '<span class="listing-rating-empty">☆☆☆☆☆</span>';
+  }
+
+  const rounded = Math.max(0, Math.min(5, Math.round(value)));
+  const fullStars = "★".repeat(rounded);
+  const emptyStars = "☆".repeat(5 - rounded);
+  return `${fullStars}${emptyStars}`;
 }
 
 window.onload = () => {
