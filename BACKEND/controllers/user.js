@@ -9,6 +9,7 @@ export const getUsers = async (req,res)=>{
     res.send(users) ;
 }
 
+
 export const getUserById = async (req,res)=>{
      const user = await User.findById(req.params.id) ;
     res.send(user) ;
@@ -39,3 +40,7 @@ export const getUserRating = async (req,res)=>{
 
 //   const theRating = theUser.
 } 
+
+export const checkMe = async (req,res)=>{
+    
+}
