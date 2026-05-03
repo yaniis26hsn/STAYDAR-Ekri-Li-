@@ -732,6 +732,12 @@ select.filter-input option {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.listing-rating-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .listing-rating-stars {
   color: var(--accent-soft);
   font-size: 18px;
@@ -769,6 +775,38 @@ select.filter-input option {
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.listing-rating-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  min-width: 92px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background:
+    linear-gradient(45deg, transparent 50%, rgba(255, 179, 107, 0.9) 50%),
+    linear-gradient(135deg, rgba(255, 179, 107, 0.9) 50%, transparent 50%),
+    rgba(255, 255, 255, 0.05);
+  background-position:
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px),
+    0 0;
+  background-size: 6px 6px, 6px 6px, auto;
+  background-repeat: no-repeat;
+  color: var(--text);
+  padding: 12px 38px 12px 14px;
+  outline: none;
+}
+
+.listing-rating-select:focus {
+  border-color: rgba(255, 179, 107, 0.45);
+  box-shadow: 0 0 0 4px rgba(244, 124, 44, 0.16);
+}
+
+.listing-rating-select option {
+  background: #171822;
+  color: var(--text);
 }
 
 .listing-rate-button:hover {
@@ -1218,6 +1256,15 @@ body.modal-open {
   .listing-rating {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .listing-rating-action {
+    width: 100%;
+  }
+
+  .listing-rating-select,
+  .listing-rate-button {
+    width: 100%;
   }
 
   .auth-panel {

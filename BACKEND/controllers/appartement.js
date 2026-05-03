@@ -217,6 +217,7 @@ export const rateAppartement = async (req,res)=>{
         
     if (!rating) {
       // in case it is a new rating we should increments the raters number
+      theApp.rateSum = Number(theApp.rateSum || 0) + newRating;
       theApp.ratersNbr++;
      }else{
           theApp.rateSum = theApp.rateSum - rating.theRating + newRating;

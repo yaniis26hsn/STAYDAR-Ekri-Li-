@@ -83,6 +83,7 @@ function renderListings(data) {
     const ratingText = ratingValue ? `${ratingValue.toFixed(1)} / 5` : "Pas encore note";
     const ratingStars = getRatingStars(ratingValue);
     const ratingCount = item.ratersNbr ? `${item.ratersNbr} avis` : "Aucun avis";
+    const ratingSelectId = `rating-value-${item._id || ""}`;
 
     return `
       <article class="card-hover listing-card">
@@ -113,9 +114,19 @@ function renderListings(data) {
                 <span>${ratingCount}</span>
               </div>
             </div>
-            <button onclick="openRatingAuth('${item._id || ""}', '${escapeForAttribute(title)}')" class="listing-rate-button">
-              Noter
-            </button>
+            <div class="listing-rating-action">
+              <select id="${ratingSelectId}" class="listing-rating-select" aria-label="Choisir une note pour ${escapeForAttribute(title)}">
+                <option value="">Note</option>
+                <option value="1">1 / 5</option>
+                <option value="2">2 / 5</option>
+                <option value="3">3 / 5</option>
+                <option value="4">4 / 5</option>
+                <option value="5">5 / 5</option>
+              </select>
+              <button onclick="handleRateClick('${item._id || ""}', '${escapeForAttribute(title)}', '${ratingSelectId}')" class="listing-rate-button">
+                Noter
+              </button>
+            </div>
           </div>
           <p class="listing-description">${teaser}</p>
           <div class="listing-footer">
@@ -161,7 +172,7 @@ function openAuthModal(id, title) {
 }
 
 function openRatingAuth(id, title) {
-  selectedReservation = { id, title, action: "rating" };
+  selectedReservation = { id, title, action: "rating", value: selectedReservation?.value || null };
   const modal = document.getElementById("auth-modal");
   const subtitle = document.getElementById("auth-modal-subtitle");
 
@@ -172,14 +183,33 @@ function openRatingAuth(id, title) {
   clearAuthFeedback();
 }
 
+function handleRateClick(id, title, selectId) {
+  const select = document.getElementById(selectId);
+  const value = Number(select?.value);
+
+  if (!Number.isInteger(value) || value < 1 || value > 5) {
+    window.alert("Choisis une note entre 1 et 5 avant de cliquer sur Noter.");
+    return;
+  }
+
+  const userId = getUserIdFromStoredToken();
+  if (!userId) {
+    selectedReservation = { id, title, action: "rating", value };
+    openRatingAuth(id, title);
+    return;
+  }
+
+  submitRating(id, title, value, userId);
+}
+
 function openAuthEntry(mode = "login") {
   selectedReservation = null;
   const modal = document.getElementById("auth-modal");
   const subtitle = document.getElementById("auth-modal-subtitle");
 
   subtitle.textContent = mode === "register"
-    ? "Cree ton compte StayDAR pour retrouver tes logements, ton token et tes prochaines reservations."
-    : "Connecte-toi a ton espace StayDAR pour reprendre ton parcours, meme sans lancer une reservation.";
+    ? "Cree ton compte Staydar pour retrouver tes logements, ton token et tes prochaines reservations."
+    : "Connecte-toi a ton espace Staydar pour reprendre ton parcours, meme sans lancer une reservation.";
 
   modal.classList.remove("hidden");
   document.body.classList.add("modal-open");
@@ -209,6 +239,61 @@ function clearAuthFeedback() {
   const feedback = document.getElementById("auth-feedback");
   feedback.textContent = "";
   feedback.className = "auth-feedback hidden";
+}
+
+function getStoredToken() {
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+}
+
+function getUserIdFromStoredToken() {
+  const token = getStoredToken();
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = JSON.parse(atob(padded));
+    return decoded?.userId || null;
+  } catch (err) {
+    console.error("Token invalide:", err);
+    return null;
+  }
+}
+
+async function submitRating(id, title, value, userId) {
+  try {
+    const res = await fetch(`${API_BASE}/rateAppartement/${value}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        Uid: userId,
+        Aid: id
+      })
+    });
+
+    const responseBody = res.headers.get("content-type")?.includes("application/json")
+      ? await res.json()
+      : await res.text();
+
+    if (!res.ok) {
+      throw new Error(typeof responseBody === "string" ? responseBody : "Erreur de notation.");
+    }
+
+    window.alert(`Merci, ta note de ${value}/5 pour ${title} a ete enregistree.`);
+    await fetchListings();
+  } catch (err) {
+    console.error("Erreur rating:", err);
+    window.alert("Impossible d envoyer la note pour le moment.");
+  }
 }
 
 async function submitAuth(event, mode) {
@@ -247,12 +332,27 @@ async function submitAuth(event, mode) {
 
     feedback.className = "auth-feedback auth-feedback-success";
     feedback.textContent = mode === "login"
-      ? `Connexion reussie. Vous pouvez maintenant reserver ${selectedReservation?.title || "ce logement"}.`
+      ? `Connexion reussie. Vous pouvez maintenant ${selectedReservation?.action === "rating" ? `noter ${selectedReservation?.title || "ce logement"}` : `reserver ${selectedReservation?.title || "ce logement"}`}.`
       : "Compte cree avec succes. Connectez-vous pour finaliser votre reservation.";
 
     if (mode === "register") {
       setAuthMode("login");
       document.querySelector("#login-form input[name='email']").value = payload.email || "";
+      return;
+    }
+
+    if (mode === "login" && selectedReservation?.action === "rating") {
+      const userId = getUserIdFromStoredToken();
+      const pendingRating = Number(selectedReservation?.value);
+
+      if (!userId || !pendingRating) {
+        feedback.className = "auth-feedback auth-feedback-error";
+        feedback.textContent = "Connexion reussie, mais la note selectionnee est introuvable.";
+        return;
+      }
+
+      await submitRating(selectedReservation.id, selectedReservation.title, pendingRating, userId);
+      closeAuthModal();
     }
   } catch (err) {
     console.error(`Erreur ${mode}:`, err);
