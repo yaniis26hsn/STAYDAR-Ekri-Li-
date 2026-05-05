@@ -83,7 +83,7 @@ function renderListings(data) {
     const ratingText = ratingValue ? `${ratingValue.toFixed(1)} / 5` : "Pas encore note";
     const ratingStars = getRatingStars(ratingValue);
     const ratingCount = item.ratersNbr ? `${item.ratersNbr} avis` : "Aucun avis";
-    const ratingSelectId = `rating-value-${item._id || ""}`;
+    const ratingPickerId = `rating-picker-${item._id || ""}`;
 
     return `
       <article class="card-hover listing-card">
@@ -115,15 +115,14 @@ function renderListings(data) {
               </div>
             </div>
             <div class="listing-rating-action">
-              <select id="${ratingSelectId}" class="listing-rating-select" aria-label="Choisir une note pour ${escapeForAttribute(title)}">
-                <option value="">Note</option>
-                <option value="1">1 / 5</option>
-                <option value="2">2 / 5</option>
-                <option value="3">3 / 5</option>
-                <option value="4">4 / 5</option>
-                <option value="5">5 / 5</option>
-              </select>
-              <button onclick="handleRateClick('${item._id || ""}', '${escapeForAttribute(title)}', '${ratingSelectId}')" class="listing-rate-button">
+              <div id="${ratingPickerId}" class="listing-rating-picker" data-selected-rating="0" aria-label="Choisir une note pour ${escapeForAttribute(title)}">
+                <button type="button" class="listing-picker-star" data-value="1" aria-label="1 etoile" onmouseenter="previewRating('${ratingPickerId}', 1)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 1)">☆</button>
+                <button type="button" class="listing-picker-star" data-value="2" aria-label="2 etoiles" onmouseenter="previewRating('${ratingPickerId}', 2)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 2)">☆</button>
+                <button type="button" class="listing-picker-star" data-value="3" aria-label="3 etoiles" onmouseenter="previewRating('${ratingPickerId}', 3)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 3)">☆</button>
+                <button type="button" class="listing-picker-star" data-value="4" aria-label="4 etoiles" onmouseenter="previewRating('${ratingPickerId}', 4)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 4)">☆</button>
+                <button type="button" class="listing-picker-star" data-value="5" aria-label="5 etoiles" onmouseenter="previewRating('${ratingPickerId}', 5)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 5)">☆</button>
+              </div>
+              <button onclick="handleRateClick('${item._id || ""}', '${escapeForAttribute(title)}', '${ratingPickerId}')" class="listing-rate-button">
                 Noter
               </button>
             </div>
@@ -184,15 +183,16 @@ function openRatingAuth(id, title) {
 }
 
 function handleRateClick(id, title, selectId) {
-  const select = document.getElementById(selectId);
-  const value = Number(select?.value);
+  const picker = document.getElementById(selectId);
+  const value = Number(picker?.dataset.selectedRating || 0);
 
   if (!Number.isInteger(value) || value < 1 || value > 5) {
-    window.alert("Choisis une note entre 1 et 5 avant de cliquer sur Noter.");
+    window.alert("Choisis une note en passant le curseur sur les etoiles puis clique sur Noter.");
     return;
   }
 
   const userId = getUserIdFromStoredToken();
+
   if (!userId) {
     selectedReservation = { id, title, action: "rating", value };
     openRatingAuth(id, title);
@@ -294,6 +294,44 @@ async function submitRating(id, title, value, userId) {
     console.error("Erreur rating:", err);
     window.alert("Impossible d envoyer la note pour le moment.");
   }
+}
+
+function previewRating(pickerId, value) {
+  paintRatingPicker(pickerId, value);
+}
+
+function resetRatingPreview(pickerId) {
+  const picker = document.getElementById(pickerId);
+  if (!picker) {
+    return;
+  }
+
+  const selectedValue = Number(picker.dataset.selectedRating || 0);
+  paintRatingPicker(pickerId, selectedValue);
+}
+
+function selectRating(pickerId, value) {
+  const picker = document.getElementById(pickerId);
+  if (!picker) {
+    return;
+  }
+
+  picker.dataset.selectedRating = String(value);
+  paintRatingPicker(pickerId, value);
+}
+
+function paintRatingPicker(pickerId, value) {
+  const picker = document.getElementById(pickerId);
+  if (!picker) {
+    return;
+  }
+
+  picker.querySelectorAll(".listing-picker-star").forEach((star) => {
+    const starValue = Number(star.dataset.value || 0);
+    const active = starValue <= value;
+    star.textContent = active ? "★" : "☆";
+    star.classList.toggle("listing-picker-star-active", active);
+  });
 }
 
 async function submitAuth(event, mode) {

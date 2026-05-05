@@ -1,6 +1,8 @@
 import Appartement from '../models/Appartement.js'
 import Rating from '../models/Rating.js';
-
+import {
+  appartementRatingExpression
+} from '../utils/rating.js';
 export const getAppartements = async (req,res)=>{
     const content = await Appartement.find() ;
     res.send(content) ;
@@ -78,7 +80,13 @@ export const betweenSurface = async (req , res)=>{
 export const betweenRating = async (req , res)=>{
   let theSmallRating = Number(req.params.rating1) > Number(req.params.rating2) ? Number(req.params.rating2) : Number(req.params.rating1) ;
   let theOtherRating = Number(req.params.rating1) < Number(req.params.rating2) ? Number(req.params.rating2) : Number(req.params.rating1) ;
-  const apps = await Appartement.find({rating: {$lte: Number(theOtherRating) , $gte: Number(theSmallRating)}  }) ;
+  const apps = await Appartement.aggregate([
+    {
+      $addFields : {rating : appartementRatingExpression}
+    } , { $match: {rating: {$lte: Number(theOtherRating) , $gte: Number(theSmallRating)}  }}
+   
+  ])
+  
     // i needed to add 'e' to gte and lte to deal with the case where the client wanted an exact rating apps so 
 // both ratings of the  are the equal 
   res.send(apps) ;
@@ -126,7 +134,15 @@ export const sortBySurface = async (req, res) => {
 };
 
 export const sortByRating = async (req, res) => {
-    const theAppartements = await Appartement.find().sort({ rating: -1 });
+    const theAppartements = await Appartement.aggregate([
+  {  
+    $addFields: {rating : appartementRatingExpression} 
+    } ,
+    {$sort: {rating: -1}}
+    
+    ]) ;
+      
+    
     res.send(theAppartements);
 };
 // ascending 
@@ -141,7 +157,16 @@ export const sortBySurfaceAsc = async (req, res) => {
 };
 
 export const sortByRatingAsc = async (req, res) => {
-    const theAppartements = await Appartement.find().sort({ rating: 1 });
+    const theAppartements = await Appartement.aggregate([
+      {
+      $addFields : {
+        rating : appartementRatingExpression
+      } 
+    } 
+      , {
+      $sort : {rating : 1} }
+      
+    ]) ;
     res.send(theAppartements);
 };
 
@@ -149,7 +174,7 @@ export const search = async (req, res) => {
     // this is a general filterer
     const { type, town, minPrice, maxPrice, minSurface, maxSurface, minRating, maxRating } = req.query;
 
-    let query = {} ;
+    const query = {} ;
 
     if (type) {
       const escapedType = type.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -165,11 +190,28 @@ export const search = async (req, res) => {
     if (minSurface || maxSurface) query.surface = {} ;
     if (minSurface) query.surface.$gte = Number(minSurface) ;
     if (maxSurface) query.surface.$lte = Number(maxSurface) ;
-    if (minRating || maxRating) query.rating = {} ;
-    if (minRating) query.rating.$gte = Number(minRating) ;
-    if (maxRating) query.rating.$lte = Number(maxRating) ;
 
-    const apps = await Appartement.find(query) ;
+    const pipeline = [{ $match: query }];
+
+    if (minRating || maxRating) {
+      const ratingQuery = {};
+      if (minRating) ratingQuery.$gte = Number(minRating);
+      if (maxRating) ratingQuery.$lte = Number(maxRating);
+
+      pipeline.push({
+        $addFields: {
+          rating: appartementRatingExpression
+        }
+      });
+
+      pipeline.push({
+        $match: {
+          rating: ratingQuery
+        }
+      });
+    }
+
+    const apps = await Appartement.aggregate(pipeline) ;
     res.send(apps) ;
 } ;
 

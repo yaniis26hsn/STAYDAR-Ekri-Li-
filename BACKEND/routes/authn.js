@@ -5,7 +5,7 @@ import {
     register ,
     login,
     googleAuthCallback,
-    ifAuthenticated
+    
 } from '../controllers/authn.js'
 import { ifAuthenticated } from '../middleware/requireAuthn.js';
 const router = express.Router() ;

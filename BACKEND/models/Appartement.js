@@ -7,8 +7,8 @@ const AppartementSchema = new mongoose.Schema({
   surface: Number ,
   description : String , // it is provided by the owner 
   type: String ,
-  rateSum : {type :Number , default: null} ,
-  ratersNbr : {type :Number , default: null} ,
+  rateSum : {type :Number , default: 0} ,
+  ratersNbr : {type :Number , default: 0} ,
   ownerId : String ,
   coordX : Number ,
   coordY : Number 
