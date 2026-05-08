@@ -479,7 +479,7 @@ main,
 
 .filter-bar {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(9, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 22px;
   padding: 20px;
@@ -734,17 +734,16 @@ select.filter-input option {
 
 .listing-rating-action {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .listing-rating-picker {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
@@ -1259,11 +1258,11 @@ body.modal-open {
 
   .listing-rating-action {
     width: 100%;
-    justify-content: space-between;
+    align-items: stretch;
   }
 
   .listing-rate-button {
-    width: auto;
+    width: 100%;
   }
 
   .auth-panel {

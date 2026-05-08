@@ -471,10 +471,11 @@ async function applyFilters() {
   const maxPrice = document.getElementById("filter-max-price").value.trim();
   const minSurface = document.getElementById("filter-min-surface").value.trim();
   const maxSurface = document.getElementById("filter-max-surface").value.trim();
-  const minRating = document.getElementById("filter-min-rating").value.trim();
-  const maxRating = document.getElementById("filter-max-rating").value.trim();
+  const exactRating = document.getElementById("filter-exact-rating").value.trim();
+  const minRating = exactRating || document.getElementById("filter-min-rating").value.trim();
+  const maxRating = exactRating || document.getElementById("filter-max-rating").value.trim();
   const sort = document.getElementById("filter-sort").value.trim();
-  const town = document.getElementById("search").value.trim().toLowerCase();
+  const town = document.getElementById("search").value.trim();
 
   const filtersUsed = [
     Boolean(town),
@@ -488,18 +489,6 @@ async function applyFilters() {
 
   if (filtersUsed === 0 && sort) {
     endpoint = getSortEndpoint(sort);
-  } else if (filtersUsed <= 1) {
-    if (town) {
-      endpoint = `${API_BASE}/getByTown/${encodeURIComponent(town)}`;
-    } else if (type) {
-      endpoint = `${API_BASE}/getByType/${encodeURIComponent(type)}`;
-    } else if (minPrice || maxPrice) {
-      endpoint = `${API_BASE}/betweenPrice/${minPrice || 0}/${maxPrice || 999999999}`;
-    } else if (minSurface || maxSurface) {
-      endpoint = `${API_BASE}/betweenSurface/${minSurface || 0}/${maxSurface || 999999999}`;
-    } else if (minRating || maxRating) {
-      endpoint = `${API_BASE}/betweenRating/${minRating || 0}/${maxRating || 5}`;
-    }
   } else {
     const params = new URLSearchParams();
     if (town) params.set("town", town);
@@ -529,6 +518,7 @@ function resetFilters() {
   document.getElementById("filter-max-surface").value = "";
   document.getElementById("filter-min-rating").value = "";
   document.getElementById("filter-max-rating").value = "";
+  document.getElementById("filter-exact-rating").value = "";
   document.getElementById("filter-sort").value = "";
   document.getElementById("search").value = "";
   fetchListings();
