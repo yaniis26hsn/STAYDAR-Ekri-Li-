@@ -477,37 +477,22 @@ async function applyFilters() {
   const sort = document.getElementById("filter-sort").value.trim();
   const town = document.getElementById("search").value.trim();
 
-  const filtersUsed = [
-    Boolean(town),
-    Boolean(type),
-    Boolean(minPrice || maxPrice),
-    Boolean(minSurface || maxSurface),
-    Boolean(minRating || maxRating)
-  ].filter(Boolean).length;
+  const params = new URLSearchParams();
+  if (town) params.set("town", town);
+  if (type) params.set("type", type);
+  if (minPrice) params.set("minPrice", minPrice);
+  if (maxPrice) params.set("maxPrice", maxPrice);
+  if (minSurface) params.set("minSurface", minSurface);
+  if (maxSurface) params.set("maxSurface", maxSurface);
+  if (minRating) params.set("minRating", minRating);
+  if (maxRating) params.set("maxRating", maxRating);
+  if (sort) params.set("sort", sort);
 
-  let endpoint = `${API_BASE}/appartements`;
-
-  if (filtersUsed === 0 && sort) {
-    endpoint = getSortEndpoint(sort);
-  } else {
-    const params = new URLSearchParams();
-    if (town) params.set("town", town);
-    if (type) params.set("type", type);
-    if (minPrice) params.set("minPrice", minPrice);
-    if (maxPrice) params.set("maxPrice", maxPrice);
-    if (minSurface) params.set("minSurface", minSurface);
-    if (maxSurface) params.set("maxSurface", maxSurface);
-    if (minRating) params.set("minRating", minRating);
-    if (maxRating) params.set("maxRating", maxRating);
-    endpoint = `${API_BASE}/search?${params.toString()}`;
-  }
+  const endpoint = params.toString()
+    ? `${API_BASE}/search?${params.toString()}`
+    : `${API_BASE}/appartements`;
 
   await loadListingsFromEndpoint(endpoint, "Filtrage en cours...");
-
-  if (sort && filtersUsed > 0) {
-    const sorted = [...displayedAppartements].sort(getSortComparator(sort));
-    renderListings(sorted);
-  }
 }
 
 function resetFilters() {
@@ -542,32 +527,6 @@ async function loadListingsFromEndpoint(endpoint, loadingMessage) {
     updateListingSummary("Filtrage indisponible");
     container.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible d appliquer les filtres.</p>';
   }
-}
-
-function getSortEndpoint(sort) {
-  const sortRoutes = {
-    "price-desc": `${API_BASE}/sortByPrice`,
-    "price-asc": `${API_BASE}/sortByPriceAsc`,
-    "surface-desc": `${API_BASE}/sortBySurface`,
-    "surface-asc": `${API_BASE}/sortBySurfaceAsc`,
-    "rating-desc": `${API_BASE}/sortByRating`,
-    "rating-asc": `${API_BASE}/sortByRatingAsc`
-  };
-
-  return sortRoutes[sort] || `${API_BASE}/appartements`;
-}
-
-function getSortComparator(sort) {
-  const comparators = {
-    "price-desc": (a, b) => (b.price || 0) - (a.price || 0),
-    "price-asc": (a, b) => (a.price || 0) - (b.price || 0),
-    "surface-desc": (a, b) => (b.surface || 0) - (a.surface || 0),
-    "surface-asc": (a, b) => (a.surface || 0) - (b.surface || 0),
-    "rating-desc": (a, b) => getAppartementRating(b) - getAppartementRating(a),
-    "rating-asc": (a, b) => getAppartementRating(a) - getAppartementRating(b)
-  };
-
-  return comparators[sort] || (() => 0);
 }
 
 function getAppartementRating(item) {

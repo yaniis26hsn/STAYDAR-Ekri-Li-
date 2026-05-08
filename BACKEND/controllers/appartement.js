@@ -134,6 +134,7 @@ export const sortBySurface = async (req, res) => {
 };
 
 export const sortByRating = async (req, res) => {
+   
     const theAppartements = await Appartement.aggregate([
   {  
     $addFields: {rating : appartementRatingExpression} 
@@ -172,7 +173,7 @@ export const sortByRatingAsc = async (req, res) => {
 
 export const search = async (req, res) => {
     // this is a general filterer
-    const { type, town, minPrice, maxPrice, minSurface, maxSurface, minRating, maxRating } = req.query;
+    const { type, town, minPrice, maxPrice, minSurface, maxSurface, minRating, maxRating, sort } = req.query;
 
     const query = {} ;
 
@@ -192,6 +193,15 @@ export const search = async (req, res) => {
     if (maxSurface) query.surface.$lte = Number(maxSurface) ;
 
     const pipeline = [{ $match: query }];
+    const needsRatingField = Boolean(minRating || maxRating || sort === 'rating-desc' || sort === 'rating-asc');
+
+    if (needsRatingField) {
+      pipeline.push({
+        $addFields: {
+          rating: appartementRatingExpression
+        }
+      });
+    }
 
     if (minRating || maxRating) {
       const ratingQuery = {};
@@ -199,15 +209,24 @@ export const search = async (req, res) => {
       if (maxRating) ratingQuery.$lte = Number(maxRating);
 
       pipeline.push({
-        $addFields: {
-          rating: appartementRatingExpression
-        }
-      });
-
-      pipeline.push({
         $match: {
           rating: ratingQuery
         }
+      });
+    }
+
+    const sortMap = {
+      'price-desc': { price: -1 },
+      'price-asc': { price: 1 },
+      'surface-desc': { surface: -1 },
+      'surface-asc': { surface: 1 },
+      'rating-desc': { rating: -1 },
+      'rating-asc': { rating: 1 }
+    };
+
+    if (sortMap[sort]) {
+      pipeline.push({
+        $sort: sortMap[sort]
       });
     }
 
