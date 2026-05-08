@@ -568,6 +568,18 @@ select.filter-input option {
   background-color: rgba(255, 255, 255, 0.07);
 }
 
+.filter-input:disabled {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  color: #7d766c;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.filter-input:disabled::placeholder {
+  color: #6c655d;
+}
+
 .filter-button {
   border: 0;
   border-radius: 22px;
