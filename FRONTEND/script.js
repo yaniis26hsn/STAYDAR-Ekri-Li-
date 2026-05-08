@@ -471,6 +471,8 @@ async function applyFilters() {
   const maxPrice = document.getElementById("filter-max-price").value.trim();
   const minSurface = document.getElementById("filter-min-surface").value.trim();
   const maxSurface = document.getElementById("filter-max-surface").value.trim();
+  const minRating = document.getElementById("filter-min-rating").value.trim();
+  const maxRating = document.getElementById("filter-max-rating").value.trim();
   const sort = document.getElementById("filter-sort").value.trim();
   const town = document.getElementById("search").value.trim().toLowerCase();
 
@@ -478,7 +480,8 @@ async function applyFilters() {
     Boolean(town),
     Boolean(type),
     Boolean(minPrice || maxPrice),
-    Boolean(minSurface || maxSurface)
+    Boolean(minSurface || maxSurface),
+    Boolean(minRating || maxRating)
   ].filter(Boolean).length;
 
   let endpoint = `${API_BASE}/appartements`;
@@ -494,6 +497,8 @@ async function applyFilters() {
       endpoint = `${API_BASE}/betweenPrice/${minPrice || 0}/${maxPrice || 999999999}`;
     } else if (minSurface || maxSurface) {
       endpoint = `${API_BASE}/betweenSurface/${minSurface || 0}/${maxSurface || 999999999}`;
+    } else if (minRating || maxRating) {
+      endpoint = `${API_BASE}/betweenRating/${minRating || 0}/${maxRating || 5}`;
     }
   } else {
     const params = new URLSearchParams();
@@ -503,6 +508,8 @@ async function applyFilters() {
     if (maxPrice) params.set("maxPrice", maxPrice);
     if (minSurface) params.set("minSurface", minSurface);
     if (maxSurface) params.set("maxSurface", maxSurface);
+    if (minRating) params.set("minRating", minRating);
+    if (maxRating) params.set("maxRating", maxRating);
     endpoint = `${API_BASE}/search?${params.toString()}`;
   }
 
@@ -520,6 +527,8 @@ function resetFilters() {
   document.getElementById("filter-max-price").value = "";
   document.getElementById("filter-min-surface").value = "";
   document.getElementById("filter-max-surface").value = "";
+  document.getElementById("filter-min-rating").value = "";
+  document.getElementById("filter-max-rating").value = "";
   document.getElementById("filter-sort").value = "";
   document.getElementById("search").value = "";
   fetchListings();
@@ -550,7 +559,9 @@ function getSortEndpoint(sort) {
     "price-desc": `${API_BASE}/sortByPrice`,
     "price-asc": `${API_BASE}/sortByPriceAsc`,
     "surface-desc": `${API_BASE}/sortBySurface`,
-    "surface-asc": `${API_BASE}/sortBySurfaceAsc`
+    "surface-asc": `${API_BASE}/sortBySurfaceAsc`,
+    "rating-desc": `${API_BASE}/sortByRating`,
+    "rating-asc": `${API_BASE}/sortByRatingAsc`
   };
 
   return sortRoutes[sort] || `${API_BASE}/appartements`;
@@ -561,7 +572,9 @@ function getSortComparator(sort) {
     "price-desc": (a, b) => (b.price || 0) - (a.price || 0),
     "price-asc": (a, b) => (a.price || 0) - (b.price || 0),
     "surface-desc": (a, b) => (b.surface || 0) - (a.surface || 0),
-    "surface-asc": (a, b) => (a.surface || 0) - (b.surface || 0)
+    "surface-asc": (a, b) => (a.surface || 0) - (b.surface || 0),
+    "rating-desc": (a, b) => getAppartementRating(b) - getAppartementRating(a),
+    "rating-asc": (a, b) => getAppartementRating(a) - getAppartementRating(b)
   };
 
   return comparators[sort] || (() => 0);

@@ -479,7 +479,7 @@ main,
 
 .filter-bar {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 22px;
   padding: 20px;
@@ -736,12 +736,16 @@ select.filter-input option {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .listing-rating-picker {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .listing-picker-star {
@@ -800,6 +804,7 @@ select.filter-input option {
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 

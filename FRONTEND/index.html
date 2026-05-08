@@ -154,6 +154,14 @@
             <input id="filter-max-surface" class="filter-input filter-input-number" type="number" min="0" placeholder="160">
           </div>
           <div class="filter-field">
+            <span class="filter-label">Note min</span>
+            <input id="filter-min-rating" class="filter-input filter-input-number" type="number" min="0" max="5" step="0.1" placeholder="0">
+          </div>
+          <div class="filter-field">
+            <span class="filter-label">Note max</span>
+            <input id="filter-max-rating" class="filter-input filter-input-number" type="number" min="0" max="5" step="0.1" placeholder="5">
+          </div>
+          <div class="filter-field">
             <span class="filter-label">Tri</span>
             <select id="filter-sort" class="filter-input">
               <option value="">Aucun</option>
@@ -161,6 +169,8 @@
               <option value="price-asc">Prix croissant</option>
               <option value="surface-desc">Surface decroissante</option>
               <option value="surface-asc">Surface croissante</option>
+              <option value="rating-desc">Note decroissante</option>
+              <option value="rating-asc">Note croissante</option>
             </select>
           </div>
           <div class="filter-actions">
