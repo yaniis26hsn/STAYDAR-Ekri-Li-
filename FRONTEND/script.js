@@ -471,9 +471,10 @@ async function applyFilters() {
   const maxPrice = document.getElementById("filter-max-price").value.trim();
   const minSurface = document.getElementById("filter-min-surface").value.trim();
   const maxSurface = document.getElementById("filter-max-surface").value.trim();
-  const exactRating = document.getElementById("filter-exact-rating").value.trim();
-  const minRating = exactRating || document.getElementById("filter-min-rating").value.trim();
-  const maxRating = exactRating || document.getElementById("filter-max-rating").value.trim();
+  const ratingFilters = getNormalizedRatingFilters();
+  const exactRating = ratingFilters.exactRating;
+  const minRating = ratingFilters.minRating;
+  const maxRating = ratingFilters.maxRating;
   const sort = document.getElementById("filter-sort").value.trim();
   const town = document.getElementById("search").value.trim();
 
@@ -506,6 +507,7 @@ function resetFilters() {
   document.getElementById("filter-exact-rating").value = "";
   document.getElementById("filter-sort").value = "";
   document.getElementById("search").value = "";
+  updateRatingFilterState();
   fetchListings();
 }
 
@@ -540,6 +542,64 @@ function getAppartementRating(item) {
   return rateSum / ratersNbr;
 }
 
+function getNormalizedRatingFilters() {
+  const minInput = document.getElementById("filter-min-rating");
+  const maxInput = document.getElementById("filter-max-rating");
+  const exactInput = document.getElementById("filter-exact-rating");
+
+  const rawMin = minInput.value.trim();
+  const rawMax = maxInput.value.trim();
+  const rawExact = exactInput.value.trim();
+
+  if (rawExact) {
+    minInput.value = "";
+    maxInput.value = "";
+    updateRatingFilterState();
+    return {
+      exactRating: rawExact,
+      minRating: rawExact,
+      maxRating: rawExact
+    };
+  }
+
+  if (!rawMin && !rawMax) {
+    updateRatingFilterState();
+    return {
+      exactRating: "",
+      minRating: "",
+      maxRating: ""
+    };
+  }
+
+  const parsedMin = rawMin ? Number(rawMin) : null;
+  const parsedMax = rawMax ? Number(rawMax) : null;
+
+  if (parsedMin !== null && parsedMax !== null && parsedMin > parsedMax) {
+    minInput.value = String(parsedMax);
+    maxInput.value = String(parsedMin);
+  }
+
+  updateRatingFilterState();
+
+  return {
+    exactRating: "",
+    minRating: minInput.value.trim(),
+    maxRating: maxInput.value.trim()
+  };
+}
+
+function updateRatingFilterState() {
+  const minInput = document.getElementById("filter-min-rating");
+  const maxInput = document.getElementById("filter-max-rating");
+  const exactInput = document.getElementById("filter-exact-rating");
+  const hasRange = Boolean(minInput.value.trim() || maxInput.value.trim());
+  const hasExact = Boolean(exactInput.value.trim());
+
+  exactInput.disabled = hasRange;
+  minInput.disabled = hasExact;
+  maxInput.disabled = hasExact;
+}
+
 function getRatingStars(value) {
   if (!value) {
     return '<span class="listing-rating-empty">☆☆☆☆☆</span>';
@@ -555,6 +615,10 @@ window.onload = () => {
   cursorGlow = document.getElementById("cursor-glow");
   document.addEventListener("pointermove", handlePointerMove);
   document.addEventListener("pointerleave", handlePointerLeave);
+  document.getElementById("filter-min-rating").addEventListener("input", updateRatingFilterState);
+  document.getElementById("filter-max-rating").addEventListener("input", updateRatingFilterState);
+  document.getElementById("filter-exact-rating").addEventListener("input", updateRatingFilterState);
+  updateRatingFilterState();
   handleOAuthRedirect();
   fetchListings();
 };
