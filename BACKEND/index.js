@@ -9,6 +9,8 @@ import passport from 'passport';
 
 import './config/passport.js'; // importing it so it executes
 
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config()
 
@@ -22,10 +24,22 @@ app.use(cors({
 app.use(passport.initialize());
 app.use(express.json());
 
+// google analitics
+// recreate __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// serve frontend folder
+app.use(express.static(path.join(__dirname, "../FRONTEND")));
+
 // routes
 app.use('/api/v1', appartementRouter) ;
 app.use('/api/v1', userRouter) ;
 app.use('/api/v1',authRouter) ;
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../FRONTEND/index.html"));
+});
 
 const startServer = async () => {
   try {
