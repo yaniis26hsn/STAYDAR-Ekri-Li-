@@ -99,7 +99,7 @@ async function loadCurrentUser() {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${fallbackResponse.status}`);
     }
 
     currentProfileUser = await response.json();
@@ -141,16 +141,28 @@ async function loadMyApparts() {
     return [];
   }
 
+  const userId = currentProfileUser?._id;
+
   try {
     const response = await fetch(`${API_BASE}/getUserApparts`, {
       headers: getAuthHeaders()
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    if (response.ok) {
+      currentProfileApparts = await response.json();
+      renderMyApparts();
+      return currentProfileApparts;
     }
 
-    currentProfileApparts = await response.json();
+    const fallbackResponse = await fetch(`${API_BASE}/appartements`);
+    if (!fallbackResponse.ok) {
+      throw new Error(`HTTP ${fallbackResponse.status}`);
+    }
+
+    const allApparts = await fallbackResponse.json();
+    currentProfileApparts = userId
+      ? allApparts.filter((appart) => String(appart.ownerId) === String(userId))
+      : [];
     renderMyApparts();
     return currentProfileApparts;
   } catch (error) {
@@ -278,7 +290,7 @@ async function saveProfile(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${fallbackResponse.status}`);
     }
 
     showProfileFeedback('Profil mis a jour avec succes.', 'success');
@@ -314,7 +326,7 @@ async function createAppartment(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${fallbackResponse.status}`);
     }
 
     form.reset();
@@ -356,7 +368,7 @@ async function saveAppartment(event, appartmentId) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${fallbackResponse.status}`);
     }
 
     showProfileFeedback('Appartement mis a jour avec succes.', 'success');
@@ -380,7 +392,7 @@ async function deleteAppartment(appartmentId) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${fallbackResponse.status}`);
     }
 
     showProfileFeedback('Appartement supprime.', 'success');
@@ -534,6 +546,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProfileChip(null);
   loadCurrentUser();
 });
+
+
 
 
 
