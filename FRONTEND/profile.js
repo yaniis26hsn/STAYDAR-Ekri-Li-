@@ -20,6 +20,27 @@ function isLoggedIn() {
   return Boolean(localStorage.getItem(TOKEN_STORAGE_KEY));
 }
 
+function getUserIdFromToken() {
+  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const payloadPart = token.split('.')[1];
+    if (!payloadPart) {
+      return null;
+    }
+
+    const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    const decoded = JSON.parse(atob(padded));
+    return decoded?.userId || null;
+  } catch {
+    return null;
+  }
+}
+
 function hideAllTabs() {
   document.querySelectorAll('.tab-content').forEach((element) => element.classList.add('hidden'));
 }
@@ -141,7 +162,7 @@ async function loadMyApparts() {
     return [];
   }
 
-  const userId = currentProfileUser?._id;
+  const userId = currentProfileUser?._id || getUserIdFromToken();
 
   try {
     const response = await fetch(`${API_BASE}/getUserApparts`, {
@@ -546,6 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProfileChip(null);
   loadCurrentUser();
 });
+
 
 
 
