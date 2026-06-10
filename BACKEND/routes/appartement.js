@@ -1,4 +1,5 @@
 import express from 'express'
+import { verifyToken } from '../middleware/auth.js';
 import {
 getAppartements,
 createAppartement,
@@ -25,9 +26,9 @@ const router = express.Router() ;
 
 router.get('/appartements', getAppartements)
 
-router.post('/appartement' , createAppartement)
+router.post('/appartement' , verifyToken ,createAppartement)
 
-router.delete('/appartement/:id' , deleteAppartement)
+router.delete('/appartement/:id' ,verifyToken , deleteAppartement)
  
 router.get('/closeAppartements', getCloseAppartements);
 
@@ -41,9 +42,10 @@ router.get('/betweenSurface/:surface1/:surface2', betweenSurface) ;
 router.get('/betweenRating/:rating1/:rating2', betweenRating) ;
 
 router.get('/getByTown/:town', getByTown);
-router.put('/appartement/:id', updateAppartement);
+router.put('/appartement/:id', verifyToken ,updateAppartement);
+// id is the id of the appartement 
 
-router.put('/updatePrice/:newPrice' , updatePrice )
+router.put('/updatePrice/:newPrice' ,verifyToken , updatePrice )
 // descending 
 router.get('/sortByPrice' , sortByPrice)
 router.get('/sortBySurface', sortBySurface);
@@ -90,7 +92,7 @@ router.get('/search', search) ;
 //     res.send("success") ;
 
 // })
-router.put('/rateAppartement/:rating' , rateAppartement)
+router.put('/rateAppartement/:rating' ,verifyToken, rateAppartement)
 
 router.get('/getFamousAppartments/:numberOfRaters' , getFamousAppartments)
 

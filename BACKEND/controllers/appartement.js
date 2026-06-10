@@ -1,4 +1,4 @@
-import Appartement from '../models/Appartement.js'
+﻿import Appartement from '../models/Appartement.js'
 import Rating from '../models/Rating.js';
 import {
   appartementRatingExpression
@@ -9,14 +9,17 @@ export const getAppartements = async (req,res)=>{
 }
 
 export const createAppartement = async (req,res)=>{
-// here one important thing must be sent is the id of the owner , it is necessary
+// here one important thing must be sent is the token , it is necessary so that 
+// we can get the userId 
+ req.body.ownerId = req.user.userId ;
   const  newAppart = new Appartement(req.body)
   await newAppart.save() ;
   res.send("successfully saved") ;
 }
 
 export const deleteAppartement = async (req,res)=>{
-  await Appartement.findByIdAndDelete(req.params.id) ;
+  let uid = req.user.userId ;
+ await Appartement.findOneAndDelete({ _id: req.params.id, ownerId: uid })
   res.send("successfuly deleted") ;
 }
  
@@ -103,7 +106,8 @@ export const getByTown = async (req, res) => {
 };
 export const updateAppartement = async (req, res) => {
       // update all fields at once except rating 
-    const theApp = await Appartement.findById(req.params.id);
+      
+    const theApp = await Appartement.findOne({ _id: req.params.id, ownerId: req.user.userId });
     theApp.price = req.body.price;
     theApp.coordX = req.body.coordX;
     theApp.coordY = req.body.coordY;
@@ -116,7 +120,9 @@ export const updateAppartement = async (req, res) => {
 };
 
 export const updatePrice = async (req,res)=>{
-    const theApp = await Appartement.findById(req.query.id) ;
+
+    const theApp = await Appartement.findOne({ _id: req.query.id, ownerId: req.user.userId }) ;
+    
     theApp.price = Number(req.params.newPrice) ; 
     await theApp.save() ;
     res.send("the price was successfuly updated") ;
@@ -268,13 +274,13 @@ export const search = async (req, res) => {
 // })
 export const rateAppartement = async (req,res)=>{
     
-    // Uid : user id and Aid is Appar id and there are both sent in the body 
+    // Aid is Appar id 
     const newRating = Number(req.params.rating) ;
 
     if( newRating> 5 ||newRating < 0 ) {res.send("invalid rating value"); return ;} ;
     const theApp =  await Appartement.findById(req.body.Aid) ;
     if (!theApp) { return res.send('appartement not found'); }
-    const rating = await Rating.findOne({ userID: req.body.Uid, AppartementID: req.body.Aid });
+    const rating = await Rating.findOne({ userID: req.user.userId, AppartementID: req.body.Aid });
         
     if (!rating) {
       // in case it is a new rating we should increments the raters number
@@ -286,7 +292,7 @@ export const rateAppartement = async (req,res)=>{
       await theApp.save() ;
 
 await Rating.updateOne(
-  { userID: req.body.Uid, AppartementID: req.body.Aid}, // filter
+  { userID: req.user.userId, AppartementID: req.body.Aid}, // filter
   { 
     $set: { 
       theRating: newRating, 

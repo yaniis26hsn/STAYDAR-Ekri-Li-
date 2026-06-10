@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -44,7 +44,7 @@
 
       <div class="topbar-actions">
         <button class="host-button">Devenir hote</button>
-        <button type="button" class="profile-chip" onclick="openAuthEntry()">
+        <button type="button" class="profile-chip" onclick="handleProfileClick()">
           <i class="fas fa-user-circle"></i>
           <span>Connexion</span>
         </button>
@@ -218,7 +218,140 @@
           <p>Ton planning de sejour sera ici avec les logements retenus, les etapes et les details pratiques.</p>
           <button class="planning-button">Creer un planning</button>
         </div>
-      </div>
+      
+      <div id="tab-4" class="tab-content hidden">
+        <section class="profile-page">
+          <div class="profile-hero">
+            <div>
+              <p class="section-kicker">Mon espace</p>
+              <h2 class="section-title">Profil et appartements</h2>
+              <p class="profile-intro">Mets a jour tes informations, ajoute un appartement et supprime ceux que tu ne proposes plus.</p>
+            </div>
+            <button type="button" class="profile-back-button" onclick="showMainArea()">
+              <i class="fas fa-arrow-left"></i>
+              <span>Retour aux logements</span>
+            </button>
+          </div>
+
+          <div id="profile-feedback" class="profile-feedback hidden"></div>
+
+          <div class="profile-grid">
+            <article class="profile-card">
+              <div class="profile-card-head">
+                <div>
+                  <p class="profile-card-kicker">Informations personnelles</p>
+                  <h3>Modifier mon profil</h3>
+                </div>
+                <span id="profile-user-role" class="profile-pill">Client</span>
+              </div>
+
+              <form id="profile-form" class="profile-form" onsubmit="saveProfile(event)">
+                <div class="profile-form-grid">
+                  <label>
+                    <span>First name</span>
+                    <input type="text" name="fname" placeholder="Yanis">
+                  </label>
+                  <label>
+                    <span>Last name</span>
+                    <input type="text" name="lname" placeholder="Ben Ali">
+                  </label>
+                </div>
+                <label>
+                  <span>Username</span>
+                  <input type="text" name="username" placeholder="yanisdz">
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input type="email" name="email" placeholder="you@example.com">
+                </label>
+                <label>
+                  <span>Phone</span>
+                  <input type="text" name="phone" placeholder="+213 555 000 000">
+                </label>
+                <label>
+                  <span>Town</span>
+                  <input type="text" name="town" placeholder="Alger">
+                </label>
+                <label>
+                  <span>Address</span>
+                  <input type="text" name="address" placeholder="Rue ...">
+                </label>
+                <label>
+                  <span>Contact links</span>
+                  <input type="text" name="contact" placeholder="https://wa.me/...">
+                </label>
+                <button type="submit" class="profile-submit">Enregistrer les modifications</button>
+              </form>
+            </article>
+
+            <article class="profile-card">
+              <div class="profile-card-head">
+                <div>
+                  <p class="profile-card-kicker">Nouveau logement</p>
+                  <h3>Ajouter un appartement</h3>
+                </div>
+                <span class="profile-pill profile-pill-accent">Owner</span>
+              </div>
+
+              <form id="appartment-form" class="profile-form" onsubmit="createAppartment(event)">
+                <div class="profile-form-grid">
+                  <label>
+                    <span>Type</span>
+                    <input type="text" name="type" placeholder="F2" required>
+                  </label>
+                  <label>
+                    <span>Town</span>
+                    <input type="text" name="town" placeholder="Oran" required>
+                  </label>
+                </div>
+                <label>
+                  <span>Address</span>
+                  <input type="text" name="address" placeholder="Centre-ville" required>
+                </label>
+                <div class="profile-form-grid">
+                  <label>
+                    <span>Price</span>
+                    <input type="number" name="price" min="0" placeholder="15000" required>
+                  </label>
+                  <label>
+                    <span>Surface</span>
+                    <input type="number" name="surface" min="0" placeholder="75" required>
+                  </label>
+                </div>
+                <label>
+                  <span>Description</span>
+                  <textarea name="description" rows="4" placeholder="Appartement lumineux ..." required></textarea>
+                </label>
+                <div class="profile-form-grid">
+                  <label>
+                    <span>Longitude</span>
+                    <input type="number" name="coordX" step="any" placeholder="36.75">
+                  </label>
+                  <label>
+                    <span>Latitude</span>
+                    <input type="number" name="coordY" step="any" placeholder="3.05">
+                  </label>
+                </div>
+                <button type="submit" class="profile-submit">Ajouter l'appartement</button>
+              </form>
+            </article>
+          </div>
+
+          <article class="profile-card profile-list-card">
+            <div class="profile-card-head">
+              <div>
+                <p class="profile-card-kicker">Mes appartements</p>
+                <h3>Gerer mes annonces</h3>
+              </div>
+              <button type="button" class="profile-refresh-button" onclick="loadMyApparts()">
+                <i class="fas fa-rotate"></i>
+                <span>Actualiser</span>
+              </button>
+            </div>
+            <div id="my-apparts" class="profile-apparts-grid"></div>
+          </article>
+        </section>
+      </div></div>
     </section>
   </main>
 
@@ -332,3 +465,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+

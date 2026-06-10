@@ -5,9 +5,10 @@ import {
     register ,
     login,
     googleAuthCallback,
+    me,
     
 } from '../controllers/authn.js'
-import { ifAuthenticated } from '../middleware/requireAuthn.js';
+
 const router = express.Router() ;
 
 router.post('/login', login) ;
@@ -19,6 +20,6 @@ router.get('/google/callback',
     passport.authenticate('google', { session: false }), 
     googleAuthCallback // Your controller function
 );
-router.get('/me' , ifAuthenticated) ;
+router.get('/me' , me) ;
 
 export default router ;
