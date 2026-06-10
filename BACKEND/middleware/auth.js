@@ -1,5 +1,8 @@
-
-
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+dotenv.config()
+ const SECRET = process.env.JWT_SECRET;
+ 
 export const verifyToken =  (req, res, next) => {
     const header = req.headers.authorization ;
     if(!header) return res.status(401).send("missing header") ;

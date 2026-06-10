@@ -12,6 +12,7 @@ export const getUsers = async (req,res)=>{
 
 export const getUserById = async (req,res)=>{
      const user = await User.findById(req.params.id) ;
+     if (!user) return res.status(404).send("user not found");
     res.send(user) ;
 }
 
@@ -23,7 +24,7 @@ export const getUsersOfATown = async (req,res)=>{
 export const updateUser = async (req,res)=>{
     const userId = req.user.userId;
     const theUser = await User.findById(userId) ;
-    
+    if (!theUser) return res.status(404).send("user not found");
     
     theUser.address = req.body.address ;
     theUser.username = req.body.username ;
@@ -45,9 +46,10 @@ export const getUserApparts = async (req,res)=>{
     // to make sure that appart id won't be enough to delete it ,
 }
 export const getUserRating = async (req,res)=>{
-  const theUser = await findById(req.params.id) ;
+  const theUser = await User.findById(req.params.id) ;
+  if(!theUser) return res.status(404).send("not found")
+  res.status(200).send({rating:theUser.rating}) ;
 
-//   const theRating = theUser.
 } 
 
 export const checkMe = async (req,res)=>{

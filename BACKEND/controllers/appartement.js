@@ -19,8 +19,9 @@ export const createAppartement = async (req,res)=>{
 
 export const deleteAppartement = async (req,res)=>{
   let uid = req.user.userId ;
- await Appartement.findOneAndDelete({ _id: req.params.id, ownerId: uid })
-  res.send("successfuly deleted") ;
+ let app = await Appartement.findOneAndDelete({ _id: req.params.id, ownerId: uid })
+ if(!app) return res.status(404).send("error") ;
+ res.send("successfuly deleted") ;
 }
  
 export const getCloseAppartements = async (req, res) => {
@@ -108,6 +109,7 @@ export const updateAppartement = async (req, res) => {
       // update all fields at once except rating 
       
     const theApp = await Appartement.findOne({ _id: req.params.id, ownerId: req.user.userId });
+    if (!theApp) return res.status(404).send("appartement not found");
     theApp.price = req.body.price;
     theApp.coordX = req.body.coordX;
     theApp.coordY = req.body.coordY;
@@ -122,7 +124,7 @@ export const updateAppartement = async (req, res) => {
 export const updatePrice = async (req,res)=>{
 
     const theApp = await Appartement.findOne({ _id: req.query.id, ownerId: req.user.userId }) ;
-    
+    if (!theApp) return res.status(404).send("appartement not found");
     theApp.price = Number(req.params.newPrice) ; 
     await theApp.save() ;
     res.send("the price was successfuly updated") ;
