@@ -292,11 +292,15 @@ async function saveProfile(event) {
 async function createAppartment(event) {
   event.preventDefault();
 
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+  const form = event.currentTarget;
+  const payload = Object.fromEntries(new FormData(form).entries());
   ['price', 'surface', 'coordX', 'coordY'].forEach((field) => {
-    if (payload[field] !== '') {
-      payload[field] = Number(payload[field]);
+    if (payload[field] === '') {
+      delete payload[field];
+      return;
     }
+
+    payload[field] = Number(payload[field]);
   });
 
   try {
@@ -313,10 +317,15 @@ async function createAppartment(event) {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    event.currentTarget.reset();
+    form.reset();
     showProfileFeedback('Appartement ajoute avec succes.', 'success');
-    await loadMyApparts();
-    await fetchListings();
+
+    loadMyApparts().catch((error) => {
+      console.error('Erreur chargement apparts apres ajout:', error);
+    });
+    fetchListings().catch((error) => {
+      console.error('Erreur rechargement logements apres ajout:', error);
+    });
   } catch (error) {
     console.error('Erreur ajout appartement:', error);
     showProfileFeedback('Impossible d ajouter l appartement.', 'error');
@@ -328,9 +337,12 @@ async function saveAppartment(event, appartmentId) {
 
   const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
   ['price', 'surface', 'coordX', 'coordY'].forEach((field) => {
-    if (payload[field] !== '') {
-      payload[field] = Number(payload[field]);
+    if (payload[field] === '') {
+      delete payload[field];
+      return;
     }
+
+    payload[field] = Number(payload[field]);
   });
 
   try {
@@ -522,5 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateProfileChip(null);
   loadCurrentUser();
 });
+
+
 
 
