@@ -8,10 +8,11 @@ export const getAppartements = async (req,res)=>{
     res.send(content) ;
 }
 export const createAppartement = async (req, res) => {
-  // here one important thing must be sent is the token , it is necessary so that 
+   // here one important thing must be sent is the token , it is necessary so that 
 // we can get the userId 
-console.log(req) 
-
+  if (!req.user?.userId) {
+    return res.status(401).send("Authentication required");
+  }
 
   const newAppart = new Appartement({
     ...req.body,
