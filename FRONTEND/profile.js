@@ -96,9 +96,17 @@ function fillProfileForm(user) {
     }
   });
 
-  const contactInput = form.querySelector('[name="contact"]');
-  if (contactInput) {
-    contactInput.value = Array.isArray(user.contact) ? user.contact.join(', ') : (user.contact || '');
+  // Populate contact inputs (supports multiple links)
+  const container = document.getElementById('contact-links-container');
+  if (container) {
+    container.innerHTML = '';
+    const links = Array.isArray(user.contact) ? user.contact : (user.contact ? [user.contact] : []);
+    if (links.length === 0) {
+      // start with one empty input
+      container.appendChild(createContactRow(''));
+    } else {
+      links.slice(0, 5).forEach((l) => container.appendChild(createContactRow(l)));
+    }
   }
 
   const role = document.getElementById('profile-user-role');
@@ -295,10 +303,13 @@ async function saveProfile(event) {
     return;
   }
 
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
-  payload.contact = payload.contact
-    ? payload.contact.split(',').map((item) => item.trim()).filter(Boolean)
-    : [];
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  // build payload excluding contact fields
+  const payload = Object.fromEntries([...formData.entries()].filter(([k]) => k !== 'contact'));
+  // collect all contact inputs
+  const contactLinks = formData.getAll('contact').map((s) => String(s || '').trim()).filter(Boolean).slice(0, 5);
+  payload.contact = contactLinks;
 
   try {
     const response = await fetch(`${API_BASE}/user/me`, {
@@ -320,6 +331,49 @@ async function saveProfile(event) {
     console.error('Erreur mise a jour profil:', error);
     showProfileFeedback('Impossible de mettre a jour ton profil.', 'error');
   }
+}
+
+// Helpers to manage contact inputs
+function createContactRow(value = '') {
+  const row = document.createElement('div');
+  row.className = 'contact-link-row';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.name = 'contact';
+  input.placeholder = 'https://...';
+  input.value = value || '';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'contact-remove-button';
+  removeBtn.textContent = '−';
+  removeBtn.onclick = () => removeContactInput(removeBtn);
+
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  return row;
+}
+
+function addContactInput() {
+  const container = document.getElementById('contact-links-container');
+  if (!container) return;
+  const current = container.querySelectorAll('.contact-link-row').length;
+  if (current >= 5) return; // max 5
+  container.appendChild(createContactRow(''));
+}
+
+function removeContactInput(button) {
+  const row = button?.closest('.contact-link-row');
+  const container = document.getElementById('contact-links-container');
+  if (!row || !container) return;
+  // keep at least one input
+  if (container.querySelectorAll('.contact-link-row').length <= 1) {
+    row.querySelector('input')?.focus();
+    row.querySelector('input').value = '';
+    return;
+  }
+  row.remove();
 }
 
 async function createAppartment(event) {

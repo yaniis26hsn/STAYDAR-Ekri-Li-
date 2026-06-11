@@ -1486,6 +1486,58 @@ body.modal-open {
   background: rgba(255, 179, 107, 0.03);
 }
 
+/* Profile contact inputs */
+.contact-links-container {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.contact-link-row input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--text);
+}
+
+.contact-remove-button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--accent-soft);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.contact-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.contact-add-button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 179, 107, 0.06);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.contact-hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .auth-divider {
   position: relative;
   text-align: center;

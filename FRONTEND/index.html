@@ -279,7 +279,16 @@
                 </label>
                 <label>
                   <span>Contact links</span>
-                  <input type="text" name="contact" placeholder="https://wa.me/...">
+                  <div id="contact-links-container" class="contact-links-container">
+                    <div class="contact-link-row">
+                      <input type="text" name="contact" placeholder="https://wa.me/...">
+                      <button type="button" class="contact-remove-button" onclick="removeContactInput(this)">−</button>
+                    </div>
+                  </div>
+                  <div class="contact-actions">
+                    <button type="button" class="contact-add-button" onclick="addContactInput()">Ajouter un lien</button>
+                    <small class="contact-hint">Ajoute jusqu'à 5 liens (WhatsApp, Instagram, Facebook...)</small>
+                  </div>
                 </label>
                 <button type="submit" class="profile-submit">Enregistrer les modifications</button>
               </form>
