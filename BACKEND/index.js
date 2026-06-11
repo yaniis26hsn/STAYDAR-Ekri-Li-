@@ -37,7 +37,7 @@ app.use('/api/v1', appartementRouter) ;
 app.use('/api/v1', userRouter) ;
 app.use('/api/v1',authRouter) ;
 
-app.get("*", (req, res) => {
+app.get("/{*path}", (req, res) => {
   res.sendFile(path.join(__dirname, "../FRONTEND/index.html"));
 });
 
