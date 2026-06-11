@@ -124,6 +124,7 @@ export const updateAppartement = async (req, res) => {
     theApp.type = req.body.type;
     theApp.surface = req.body.surface;
     theApp.address = req.body.address;
+    theApp.description = req.body.description;
     await theApp.save();
     res.send("successfully updated");
 };

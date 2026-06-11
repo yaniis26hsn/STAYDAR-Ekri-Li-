@@ -120,7 +120,7 @@ async function loadCurrentUser() {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${fallbackResponse.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     currentProfileUser = await response.json();
@@ -311,7 +311,7 @@ async function saveProfile(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${fallbackResponse.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     showProfileFeedback('Profil mis a jour avec succes.', 'success');
@@ -347,7 +347,7 @@ async function createAppartment(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${fallbackResponse.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     form.reset();
@@ -389,7 +389,7 @@ async function saveAppartment(event, appartmentId) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${fallbackResponse.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     showProfileFeedback('Appartement mis a jour avec succes.', 'success');
@@ -413,7 +413,7 @@ async function deleteAppartment(appartmentId) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${fallbackResponse.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
 
     showProfileFeedback('Appartement supprime.', 'success');
