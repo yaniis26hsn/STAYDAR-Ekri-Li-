@@ -1,4 +1,5 @@
 ﻿import Appartement from '../models/Appartement.js'
+import User from '../models/User.js'
 import Rating from '../models/Rating.js';
 import {
   appartementRatingExpression
@@ -187,6 +188,7 @@ export const sortByRatingAsc = async (req, res) => {
     res.send(theAppartements);
 };
 
+
 export const search = async (req, res) => {
     // this is a general filterer
     const { type, town, minPrice, maxPrice, minSurface, maxSurface, minRating, maxRating, sort } = req.query;
@@ -318,3 +320,11 @@ export const getFamousAppartments = async (req,res)=>{
    const apps =  await Appartement.find({ratersNbr : {$gt: Number(req.params.numberOfRaters)}}) ;
     res.send(apps) ;
 }
+
+export const ContactAppartOwner = async (req,res)=>{
+  const app = await Appartement.findById(req.params.id);
+  if(!app) return res.status(404).send("not found");
+  const owner = await User.findById(app.ownerId);
+  if(!owner) return res.status(404).send("not found");
+  res.status(200).send({contact: owner.contact});
+};

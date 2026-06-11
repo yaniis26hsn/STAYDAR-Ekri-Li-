@@ -20,13 +20,15 @@ sortBySurfaceAsc,
 sortByRatingAsc,
 search,
 rateAppartement,
-getFamousAppartments
+getFamousAppartments ,
+ContactAppartOwner
 } from '../controllers/appartement.js'
 const router = express.Router() ;
 
 router.get('/appartements', getAppartements)
 
 router.post('/appartement' , verifyToken ,createAppartement)
+// TODO: make sure that owner don't have more than 10 apparts before adding 
 
 router.delete('/appartement/:id' ,verifyToken , deleteAppartement)
  
@@ -95,5 +97,6 @@ router.get('/search', search) ;
 router.put('/rateAppartement/:rating' ,verifyToken, rateAppartement)
 
 router.get('/getFamousAppartments/:numberOfRaters' , getFamousAppartments)
+router.get('/ContactAppartOwner/:id',verifyToken, ContactAppartOwner) 
 
 export default router ;
