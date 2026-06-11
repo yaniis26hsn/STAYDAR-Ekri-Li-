@@ -1014,12 +1014,13 @@ select.filter-input option {
 .profile-form textarea {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0d0d13;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text);
-  border-radius: 18px;
-  padding: 14px 16px;
+  border-radius: 24px;
+  padding: 18px 20px;
   outline: none;
   box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .profile-form textarea {
@@ -1031,7 +1032,7 @@ select.filter-input option {
 .profile-form textarea:focus {
   border-color: rgba(255, 179, 107, 0.45);
   box-shadow: 0 0 0 4px rgba(244, 124, 44, 0.16);
-  background: #15151d;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .profile-submit {
