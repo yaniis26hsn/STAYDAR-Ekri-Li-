@@ -214,7 +214,7 @@ function renderMyApparts() {
         </div>
         <strong>${Number(appart.price || 0).toLocaleString('fr-DZ')} DA</strong>
       </div>
-      <form class="profile-appart-form" onsubmit="saveAppartment(event, '${escapeHtml(appart._id)}')">
+      <form class="profile-form" onsubmit="saveAppartment(event, '${escapeHtml(appart._id)}')">
         <div class="profile-form-grid profile-form-grid-tight">
           <label>
             <span>Type</span>

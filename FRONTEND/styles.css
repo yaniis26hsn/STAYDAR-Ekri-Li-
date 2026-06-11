@@ -1084,11 +1084,6 @@ select.filter-input option {
   white-space: nowrap;
 }
 
-.profile-appart-form {
-  display: grid;
-  gap: 12px;
-}
-
 .profile-appart-actions {
   display: flex;
   align-items: center;
