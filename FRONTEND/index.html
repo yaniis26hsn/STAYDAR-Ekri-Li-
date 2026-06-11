@@ -463,6 +463,82 @@
     </div>
   </div>
 
+  <div id="owner-contact-modal" class="auth-modal hidden" aria-hidden="true">
+    <div class="auth-backdrop" onclick="closeOwnerContactModal()"></div>
+    <div class="auth-panel">
+      <button type="button" class="auth-close" onclick="closeOwnerContactModal()" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="auth-shell">
+        <aside class="auth-aside">
+          <p class="auth-kicker">Proprietaire</p>
+          <h3>Contacte le proprietaire</h3>
+          <p class="auth-lead">Voici les informations de contact du proprietaire de ce logement.</p>
+          <div class="auth-benefits">
+            <div class="auth-benefit-card">
+              <span class="auth-benefit-icon"><i class="fas fa-phone"></i></span>
+              <div>
+                <strong>Communication directe</strong>
+                <span>Contacte le proprietaire directement pour les details.</span>
+              </div>
+            </div>
+            <div class="auth-benefit-card">
+              <span class="auth-benefit-icon"><i class="fas fa-message"></i></span>
+              <div>
+                <strong>Reponses rapides</strong>
+                <span>Les proprietaires sont generallement reactifs et a l'ecoute.</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth-aside-footer">
+            <span><i class="fas fa-check-circle"></i> Information verifiee</span>
+            <span><i class="fas fa-star"></i> Proprietaire de confiance</span>
+          </div>
+        </aside>
+        <div class="auth-main">
+          <div class="auth-header-row">
+            <div class="auth-copy">
+              <p class="auth-kicker">Contact proprietaire</p>
+              <h4>Informations de contact</h4>
+            </div>
+            <div class="auth-status-pill">Staydar Verified</div>
+          </div>
+
+          <div class="owner-contact-card">
+            <div class="owner-contact-header">
+              <div class="owner-contact-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="owner-contact-name-info">
+                <h3 id="owner-name" class="owner-contact-name">Proprietaire</h3>
+                <p id="owner-town" class="owner-contact-town">Ville</p>
+              </div>
+            </div>
+
+            <div class="owner-contact-details">
+              <div class="owner-contact-detail">
+                <span class="owner-contact-label"><i class="fas fa-envelope"></i> Email</span>
+                <p id="owner-email" class="owner-contact-value">email@example.com</p>
+              </div>
+              <div class="owner-contact-detail">
+                <span class="owner-contact-label"><i class="fas fa-phone"></i> Telephone</span>
+                <p id="owner-phone" class="owner-contact-value">+213 555 000 000</p>
+              </div>
+            </div>
+
+            <div id="owner-contact-link" class="owner-contact-actions">
+              <!-- Contact link will be inserted here -->
+            </div>
+
+            <p id="owner-contact-feedback" class="auth-feedback hidden"></p>
+
+            <button type="button" class="auth-submit" onclick="closeOwnerContactModal()">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script src="profile.js"></script>
 </body>

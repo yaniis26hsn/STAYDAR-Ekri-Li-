@@ -160,14 +160,88 @@ function escapeForAttribute(value) {
 
 function openAuthModal(id, title) {
   selectedReservation = { id, title };
-  const modal = document.getElementById("auth-modal");
-  const subtitle = document.getElementById("auth-modal-subtitle");
+  
+  // Check if user is logged in
+  const token = getStoredToken();
+  if (token) {
+    // User is logged in, show owner contact details
+    fetchAndShowOwnerDetails(id, title);
+  } else {
+    // User is not logged in, show auth modal
+    const modal = document.getElementById("auth-modal");
+    const subtitle = document.getElementById("auth-modal-subtitle");
 
-  subtitle.textContent = `Identifie-toi ou cree un compte pour reserver ${title}.`;
+    subtitle.textContent = `Identifie-toi ou cree un compte pour reserver ${title}.`;
+    modal.classList.remove("hidden");
+    document.body.classList.add("modal-open");
+    setAuthMode("login");
+    clearAuthFeedback();
+  }
+}
+
+async function fetchAndShowOwnerDetails(apartmentId, title) {
+  const token = getStoredToken();
+  
+  try {
+    const res = await fetch(`${API_BASE}/ContactAppartOwner/${apartmentId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const ownerData = await res.json();
+    showOwnerContactModal(ownerData, title, apartmentId);
+  } catch (err) {
+    console.error("Erreur chargement contact proprietaire:", err);
+    const feedback = document.getElementById("owner-contact-feedback");
+    if (feedback) {
+      feedback.className = "auth-feedback auth-feedback-error";
+      feedback.textContent = "Impossible de charger les informations du proprietaire.";
+    }
+  }
+}
+
+function showOwnerContactModal(ownerData, title, apartmentId) {
+  const modal = document.getElementById("owner-contact-modal");
+  if (!modal) {
+    console.error("Owner contact modal not found");
+    return;
+  }
+
+  // Populate owner details
+  document.getElementById("owner-name").textContent = `${ownerData.fname || ""} ${ownerData.lname || ""}`.trim() || "Proprietaire";
+  document.getElementById("owner-email").textContent = ownerData.email || "Email non disponible";
+  document.getElementById("owner-phone").textContent = ownerData.phone || "Telephone non disponible";
+  document.getElementById("owner-town").textContent = ownerData.town || "Ville non renseignee";
+  
+  // Create contact link
+  const contactLinkContainer = document.getElementById("owner-contact-link");
+  if (ownerData.contact) {
+    contactLinkContainer.innerHTML = `<a href="${ownerData.contact}" target="_blank" class="owner-contact-whatsapp">
+      <i class="fab fa-whatsapp"></i> Contacter via WhatsApp
+    </a>`;
+  } else {
+    contactLinkContainer.innerHTML = '<span class="owner-contact-unavailable">Lien de contact non disponible</span>';
+  }
+
+  // Show modal
   modal.classList.remove("hidden");
   document.body.classList.add("modal-open");
-  setAuthMode("login");
   clearAuthFeedback();
+}
+
+function closeOwnerContactModal() {
+  const modal = document.getElementById("owner-contact-modal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+  document.body.classList.remove("modal-open");
 }
 
 function openRatingAuth(id, title) {
