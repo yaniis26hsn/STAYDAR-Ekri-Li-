@@ -100,3 +100,5 @@ router.get('/getFamousAppartments/:numberOfRaters' , getFamousAppartments)
 router.get('/ContactAppartOwner/:id',verifyToken, ContactAppartOwner) 
 
 export default router ;
+
+ 

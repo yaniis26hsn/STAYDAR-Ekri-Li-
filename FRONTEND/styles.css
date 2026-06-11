@@ -1454,7 +1454,36 @@ body.modal-open {
   color: #fca5a5;
   font-size: 14px;
 }
+.owner-contact-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.owner-contact-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.owner-contact-link-item i {
+  width: 20px;
+  text-align: center;
   color: var(--accent-soft);
+}
+
+.owner-contact-link-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 179, 107, 0.12);
+  background: rgba(255, 179, 107, 0.03);
 }
 
 .auth-divider {

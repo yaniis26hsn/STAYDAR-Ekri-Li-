@@ -220,14 +220,67 @@ function showOwnerContactModal(ownerData, title, apartmentId) {
   document.getElementById("owner-phone").textContent = ownerData.phone || "Telephone non disponible";
   document.getElementById("owner-town").textContent = ownerData.town || "Ville non renseignee";
   
-  // Create contact link
+  // Create contact link(s) — `ownerData.contact` expected to be an array of links
   const contactLinkContainer = document.getElementById("owner-contact-link");
-  if (ownerData.contact) {
-    contactLinkContainer.innerHTML = `<a href="${ownerData.contact}" target="_blank" class="owner-contact-whatsapp">
-      <i class="fab fa-whatsapp"></i> Contacter via WhatsApp
-    </a>`;
-  } else {
+  contactLinkContainer.innerHTML = "";
+
+  const links = Array.isArray(ownerData.contact) ? ownerData.contact : (ownerData.contact ? [ownerData.contact] : []);
+
+  if (links.length === 0) {
     contactLinkContainer.innerHTML = '<span class="owner-contact-unavailable">Lien de contact non disponible</span>';
+  } else {
+    const list = document.createElement("div");
+    list.className = "owner-contact-link-list";
+
+    links.forEach((lnk) => {
+      if (!lnk || typeof lnk !== "string") return;
+      let href = lnk;
+      // ensure scheme exists for URL parsing
+      if (!/^\w+:\/\//.test(href) && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
+        href = href.startsWith("//") ? window.location.protocol + href : ("https://" + href);
+      }
+
+      const { iconClass, label } = getIconAndLabelForLink(href);
+
+      const a = document.createElement("a");
+      a.className = "owner-contact-link-item";
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.innerHTML = `<i class="${iconClass}"></i> <span class="owner-contact-link-label">${escapeHtml(label)}</span>`;
+
+      list.appendChild(a);
+    });
+
+    contactLinkContainer.appendChild(list);
+  }
+
+  // Helpers
+  function getIconAndLabelForLink(href) {
+    try {
+      const lowered = href.toLowerCase();
+      if (lowered.startsWith("mailto:")) return { iconClass: "fas fa-envelope", label: href.replace(/mailto:/i, "") };
+      if (lowered.startsWith("tel:")) return { iconClass: "fas fa-phone", label: href.replace(/tel:/i, "") };
+      const url = new URL(href);
+      const host = url.hostname;
+
+      if (host.includes("wa.me") || host.includes("whatsapp")) return { iconClass: "fab fa-whatsapp", label: "WhatsApp" };
+      if (host.includes("facebook.com")) return { iconClass: "fab fa-facebook", label: "Facebook" };
+      if (host.includes("instagram.com")) return { iconClass: "fab fa-instagram", label: "Instagram" };
+      if (host.includes("t.me") || host.includes("telegram")) return { iconClass: "fab fa-telegram", label: "Telegram" };
+      if (host.includes("linkedin.com")) return { iconClass: "fab fa-linkedin", label: "LinkedIn" };
+      if (host.includes("twitter.com") || host.includes("x.com")) return { iconClass: "fab fa-x-twitter", label: "Twitter" };
+      if (host.includes("tiktok.com")) return { iconClass: "fab fa-tiktok", label: "TikTok" };
+
+      // fallback: show hostname
+      return { iconClass: "fas fa-link", label: host.replace(/^www\./, "") };
+    } catch (err) {
+      return { iconClass: "fas fa-link", label: href };
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   // Show modal
