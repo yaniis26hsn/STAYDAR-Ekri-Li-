@@ -10,6 +10,9 @@ export const getAppartements = async (req,res)=>{
 export const createAppartement = async (req, res) => {
   // here one important thing must be sent is the token , it is necessary so that 
 // we can get the userId 
+console.log(req) 
+
+
   const newAppart = new Appartement({
     ...req.body,
     ownerId: req.user.userId
