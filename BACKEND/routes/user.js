@@ -25,5 +25,6 @@ router.put('/user/me' ,  verifyToken,updateUser )
 
 router.get('/userRating/:id' , getUserRating )
 
+
 export default router ;
 

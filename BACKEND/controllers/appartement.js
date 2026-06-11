@@ -326,5 +326,14 @@ export const ContactAppartOwner = async (req,res)=>{
   if(!app) return res.status(404).send("not found");
   const owner = await User.findById(app.ownerId);
   if(!owner) return res.status(404).send("not found");
-  res.status(200).send({contact: owner.contact});
+  
+  res.status(200).send({
+    fname: owner.fname,
+    lname: owner.lname,
+    email: owner.email,
+    phone: owner.phone,
+    contact: owner.contact,
+    town: owner.town
+  });
+
 };
