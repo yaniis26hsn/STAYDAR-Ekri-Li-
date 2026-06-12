@@ -625,6 +625,14 @@ select.filter-input option {
   gap: 18px;
 }
 
+#admin-user-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#admin-my-apparts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .card-hover {
   transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease;
 }
@@ -1622,6 +1630,14 @@ body.modal-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  #admin-user-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #admin-my-apparts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .filter-bar {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1756,6 +1772,11 @@ body.modal-open {
   .profile-appart-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  #admin-user-list,
+  #admin-my-apparts {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -622,23 +622,62 @@ function renderAdminUserDetail(user, rating = null) {
   const detail = document.getElementById("admin-user-detail");
   if (!detail) return;
   detail.classList.remove("hidden");
+
+  const fields = ["fname", "lname", "username", "email", "phone", "town", "address"];
+  const formFields = fields.map((f) => `
+    <label>
+      <span>${f.charAt(0).toUpperCase() + f.slice(1)}</span>
+      <input type="text" name="${f}" value="${escapeForAttribute(user[f] || "")}" class="filter-input">
+    </label>
+  `).join("");
+
   detail.innerHTML = `
     <div class="profile-card-head">
       <div>
         <p class="profile-card-kicker">Détails utilisateur</p>
         <h3>${escapeForAttribute(`${user.fname || ""} ${user.lname || ""}`.trim() || user.username || "Utilisateur")}</h3>
       </div>
-      <span class="profile-pill">${escapeForAttribute(user.role || "normal")}</span>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <span class="profile-pill">${escapeForAttribute(user.role || "normal")}</span>
+        <span class="profile-pill" style="background:rgba(244,124,44,0.12);border-color:rgba(244,124,44,0.24);">Note: ${rating !== null ? escapeForAttribute(String(rating)) : "Cliquez Rating"}</span>
+      </div>
     </div>
-    <div class="profile-form-grid">
-      <p><strong>Email:</strong> ${escapeForAttribute(user.email || "-")}</p>
-      <p><strong>Ville:</strong> ${escapeForAttribute(user.town || "-")}</p>
-      <p><strong>Téléphone:</strong> ${escapeForAttribute(user.phone || "-")}</p>
-      <p><strong>Adresse:</strong> ${escapeForAttribute(user.address || "-")}</p>
-      <p><strong>Username:</strong> ${escapeForAttribute(user.username || "-")}</p>
-      <p><strong>Note:</strong> ${rating !== null ? escapeForAttribute(String(rating)) : "Cliquez sur Rating"}</p>
-    </div>
+    <form id="admin-user-edit-form" class="profile-form" onsubmit="updateAdminUser(event)">
+      <div class="profile-form-grid">
+        ${formFields}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button type="submit" class="filter-button">Enregistrer</button>
+        <button type="button" class="filter-button filter-button-secondary" onclick="selectAdminUser('${user._id}')">Annuler</button>
+      </div>
+    </form>
   `;
+}
+
+async function updateAdminUser(event) {
+  event.preventDefault();
+  if (!selectedAdminUser?._id) return;
+  setAdminPanelMessage("Mise a jour en cours...");
+
+  const form = event.currentTarget;
+  const payload = Object.fromEntries(new FormData(form).entries());
+
+  try {
+    const res = await fetch(`${API_BASE}/user/${selectedAdminUser._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setAdminPanelMessage("Utilisateur mis a jour avec succes.");
+    selectAdminUser(selectedAdminUser._id);
+  } catch (err) {
+    console.error("Erreur mise a jour utilisateur:", err);
+    setAdminPanelMessage("Impossible de mettre a jour l'utilisateur.");
+  }
 }
 
 async function loadMyAppartmentsAdmin() {
