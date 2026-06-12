@@ -10,7 +10,7 @@ const AppartementSchema = new mongoose.Schema({
   rateSum : {type :Number , default: 0} ,
   ratersNbr : {type :Number , default: 0} ,
   ownerId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "User",
     required: true
   },
