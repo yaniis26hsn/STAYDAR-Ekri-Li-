@@ -56,7 +56,7 @@ export const register = async (req,res)=>{
         
         if(passwordMatch){
             const token = jwt.sign(
-               { userId: user.id },
+               { userId: user.id , role : user.role},
                SECRET ,
                {expiresIn : "1h"}
             )
@@ -74,7 +74,7 @@ export const register = async (req,res)=>{
 export const googleAuthCallback = (req, res) => {
     // Passport attaches the user found/created in the config to req.user
     const token = jwt.sign(
-        { userId: req.user.id },
+        { userId: req.user.id , role : req.user.role },
         SECRET,
         { expiresIn: "1h" }
     );

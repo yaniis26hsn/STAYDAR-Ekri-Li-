@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 
+
 const UserSchema = new mongoose.Schema({
   address:  {
     type : String ,
@@ -29,6 +30,11 @@ const UserSchema = new mongoose.Schema({
   enum: ["local", "google"],
   default: "local"
 } ,
+  role : {
+   type : String,
+   enum : ["admin", "normal"] ,
+   default : "normal"
+  } ,
 
   password : {
     type : String ,

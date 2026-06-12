@@ -10,20 +10,22 @@ getUserRating,
 getUserApparts
 } from '../controllers/user.js';
 
+import { verifyAdmin } from '../middleware/verifyAdmin.js';
+
 const router = express.Router() ;
 
 
-router.delete('/user/:id' , deleteUser)
-router.get('/user' , getUsers)
+router.delete('/user/:id',  verifyToken ,verifyAdmin, deleteUser)
+router.get('/user',  verifyToken ,verifyAdmin , getUsers)
 
-router.get('/user/:id' , getUserById)
-router.get('/getUserApparts',  verifyToken ,getUserApparts);
+router.get('/user/:id' ,  verifyToken,verifyAdmin, getUserById)
+router.get('/getUserApparts', verifyToken ,getUserApparts);
 
-router.get('/getUsersOfATown/:town' , getUsersOfATown)
+router.get('/getUsersOfATown/:town' , verifyToken,verifyAdmin, getUsersOfATown)
 
 router.put('/user/me' ,  verifyToken,updateUser )
 
-router.get('/userRating/:id' , getUserRating )
+router.get('/userRating/:id' , verifyToken,verifyAdmin, getUserRating )
 
 
 export default router ;
