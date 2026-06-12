@@ -1,18 +1,61 @@
-Hello this is my startup , it's a small website , the project is still under devolpment , but you can still  access it through render where it was deployed : staydar.onrender.com
+﻿# Staydar Backend
 
-## Backend Overview
+This repository contains the backend for Staydar, an apartment rental and listing platform built with Node.js, Express, MongoDB, and JWT authentication.
 
-This project includes a Node.js and Express backend for an apartment rental/listing application. It uses MongoDB with Mongoose, JWT authentication, and Google OAuth with Passport.
+## Purpose
 
-## Features
+This backend focuses on the core platform logic:
 
-- User registration and login
-- Google OAuth authentication
-- Apartment CRUD endpoints
-- Filtering by town, type, price, surface, and rating
-- Sorting and search endpoints
+- authentication and session restoration with JWT
+- user profile management
+- apartment ownership and moderation
+- listing discovery through search, filters, sorting, and ratings
 
-## Tech Stack
+## Main concepts
+
+- **JWT session**: the frontend stores the token and sends it on protected requests
+- **Authenticated user**: the backend reads the user id from the token payload
+- **Ownership**: apartments belong to one user through `ownerId`
+- **Ratings**: users can rate apartments, and the backend keeps an aggregate score
+
+## Data models
+
+- **User**: profile data, credentials, contact info, and a rating summary
+- **Appartement**: apartment details plus `ownerId`
+- **Rating**: one user rating per apartment
+
+## Auth flow
+
+- `POST /login` returns a JWT token
+- `POST /register` creates a user account
+- `GET /google` and `GET /google/callback` support Google OAuth
+- `GET /me` returns the current authenticated user
+- Protected routes expect `Authorization: Bearer <token>`
+
+## User flow
+
+- `PUT /user/me` updates the logged-in user profile
+- `GET /getUserApparts` returns only the apartments owned by the logged-in user
+- Public user lookup routes still exist for later role-based authorization work
+
+## Apartment flow
+
+- `POST /appartement` creates an apartment and stores the authenticated user as `ownerId`
+- `PUT /appartement/:id` updates only apartments owned by the authenticated user
+- `DELETE /appartement/:id` deletes only apartments owned by the authenticated user
+- `PUT /updatePrice/:newPrice` updates the owner’s apartment price
+- `PUT /rateAppartement/:rating` stores or updates a user rating for an apartment
+
+## Query endpoints
+
+The backend also supports:
+
+- search by town, type, price, surface, and rating
+- sort by price, surface, and rating
+- rating range filters
+- nearby apartment lookup by coordinates
+
+## Tech stack
 
 - Node.js
 - Express
@@ -20,14 +63,14 @@ This project includes a Node.js and Express backend for an apartment rental/list
 - JWT
 - Passport Google OAuth 2.0
 
-## Backend Setup
+## Setup
 
 ```bash
 cd BACKEND
 npm install
 ```
 
-Create a `.env` file in `BACKEND/` with:
+Create `BACKEND/.env` with:
 
 ```env
 PORT=4000
@@ -39,52 +82,25 @@ GOOGLE_CALLBACK_URL=your_google_callback_url
 FRONTEND_URL=your_frontend_url
 ```
 
-Run the backend:
+Run locally:
 
 ```bash
 npm run dev
 ```
 
-For production:
+Production:
 
 ```bash
 npm start
 ```
 
-## API Base URL
+## API base
 
 `/api/v1`
 
-## Main Endpoints
+## Notes
 
-### Auth
-
-- `POST /register`
-- `POST /login`
-- `GET /google`
-- `GET /google/callback`
-
-### Users
-
-- `GET /user`
-- `GET /user/:id`
-- `PUT /user/:id`
-- `DELETE /user/:id`
-- `GET /getUsersOfATown/:town`
-
-### Appartements
-
-- `GET /appartements`
-- `POST /appartement`
-- `PUT /appartement/:id`
-- `DELETE /appartement/:id`
-- `GET /search`
-- `GET /getByTown/:town`
-- `GET /getByType/:type`
-- `GET /betweenPrice/:price1/:price2`
-- `GET /betweenSurface/:surface1/:surface2`
-- `GET /betweenRating/:rating1/:rating2`
-- `GET /sortByPrice`
-- `GET /sortBySurface`
-- `GET /sortByRating`
-- `PUT /rateAppartement/:rating`
+- `ownerId` is assigned server-side from the JWT, not from the frontend.
+- Apartment edit/delete routes check ownership.
+- The frontend uses the token to restore the session and load the profile dashboard.
+- The app serves the frontend bundle from Express in production, so the backend and frontend stay in one deployment on Render.
