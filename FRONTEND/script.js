@@ -610,7 +610,7 @@ async function showUserRating(userId) {
     if (selectedAdminUser) {
       renderAdminUserDetail(selectedAdminUser, rating);
     } else {
-      setAdminPanelMessage(`Note recuperee : ${rating || "-"}. Cliquez sur Voir pour afficher le detail.`);
+      setAdminPanelMessage(`Note recuperee : ${rating?.rating ?? "-"}. Cliquez sur Voir pour afficher le detail.`);
     }
   } catch (err) {
     console.error("Erreur recup note utilisateur:", err);
@@ -639,7 +639,7 @@ function renderAdminUserDetail(user, rating = null) {
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <span class="profile-pill">${escapeForAttribute(user.role || "normal")}</span>
-        <span class="profile-pill" style="background:rgba(244,124,44,0.12);border-color:rgba(244,124,44,0.24);">Note: ${rating !== null ? escapeForAttribute(String(rating)) : "Cliquez Rating"}</span>
+        <span class="profile-pill" style="background:rgba(244,124,44,0.12);border-color:rgba(244,124,44,0.24);">Note: ${rating?.rating != null ? escapeForAttribute(String(rating.rating)) : "Cliquez Rating"}</span>
       </div>
     </div>
     <form id="admin-user-edit-form" class="profile-form" onsubmit="updateAdminUser(event)">
