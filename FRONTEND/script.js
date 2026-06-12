@@ -453,11 +453,11 @@ function renderAdminUserList(users) {
           <div class="listing-meta">
             <span><i class="fas fa-phone"></i> ${escapeForAttribute(user.phone || "-")}</span>
             <span><i class="fas fa-map-marker-alt"></i> ${escapeForAttribute(user.town || "-")}</span>
+            <span><i class="fas fa-star"></i> ${user.rating != null ? escapeForAttribute(String(user.rating)) : "N/A"}</span>
           </div>
           <div class="listing-footer">
             <button class="listing-cta" onclick="selectAdminUser('${user._id}')">Voir</button>
             <button class="listing-cta listing-cta-secondary" onclick="deleteAdminUser('${user._id}', '${escapeForAttribute(name)}')">Supprimer</button>
-            <button class="listing-cta listing-cta-tertiary" onclick="showUserRating('${user._id}')">Rating</button>
           </div>
         </div>
       </article>
@@ -618,7 +618,7 @@ async function showUserRating(userId) {
   }
 }
 
-function renderAdminUserDetail(user, rating = null) {
+function renderAdminUserDetail(user) {
   const detail = document.getElementById("admin-user-detail");
   if (!detail) return;
   detail.classList.remove("hidden");
@@ -639,7 +639,7 @@ function renderAdminUserDetail(user, rating = null) {
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <span class="profile-pill">${escapeForAttribute(user.role || "normal")}</span>
-        <span class="profile-pill" style="background:rgba(244,124,44,0.12);border-color:rgba(244,124,44,0.24);">Note: ${rating?.rating != null ? escapeForAttribute(String(rating.rating)) : "Cliquez Rating"}</span>
+        <span class="profile-pill" style="background:rgba(244,124,44,0.12);border-color:rgba(244,124,44,0.24);">Note: ${user.rating != null ? escapeForAttribute(String(user.rating)) : "N/A"}</span>
       </div>
     </div>
     <form id="admin-user-edit-form" class="profile-form" onsubmit="updateAdminUser(event)">
