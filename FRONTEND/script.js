@@ -1,6 +1,4 @@
-const API_BASE = window.location.protocol === 'file:'
-  ? 'http://localhost:4000/api/v1'
-  : '/api/v1';
+const API_BASE = 'https://staydar-api.onrender.com/api/v1';
 const CLOSE_RADIUS_KM = 15;
 const TOKEN_STORAGE_KEY = "staydar_token";
 let appartements = [];

@@ -557,30 +557,25 @@ async function submitAuth(event, mode) {
     if (mode === 'login' && responseBody?.token) {
       localStorage.setItem(TOKEN_STORAGE_KEY, responseBody.token);
       await loadCurrentUser();
-    }
-
-    feedback.className = 'auth-feedback auth-feedback-success';
-    feedback.textContent = mode === 'login'
-      ? `Connexion reussie. Vous pouvez maintenant ${selectedReservation?.action === 'rating' ? `noter ${selectedReservation?.title || 'ce logement'}` : `reserver ${selectedReservation?.title || 'ce logement'}`}.`
-      : 'Compte cree avec succes. Connectez-vous pour finaliser votre reservation.';
-
-    if (mode === 'register') {
-      setAuthMode('login');
-      document.querySelector('#login-form input[name="email"]').value = payload.email || '';
+      closeAuthModal();
+      if (selectedReservation?.id && selectedReservation?.action !== 'rating') {
+        fetchAndShowOwnerDetails(selectedReservation.id, selectedReservation.title);
+      } else if (selectedReservation?.action === 'rating') {
+        const pendingRating = Number(selectedReservation?.value);
+        if (pendingRating) {
+          await submitRating(selectedReservation.id, selectedReservation.title, pendingRating);
+        }
+      }
+      selectedReservation = null;
       return;
     }
 
-    if (mode === 'login' && selectedReservation?.action === 'rating') {
-      const pendingRating = Number(selectedReservation?.value);
-
-      if (!pendingRating) {
-        feedback.className = 'auth-feedback auth-feedback-error';
-        feedback.textContent = 'Connexion reussie, mais la note selectionnee est introuvable.';
-        return;
-      }
-
-      await submitRating(selectedReservation.id, selectedReservation.title, pendingRating);
-      closeAuthModal();
+    if (mode === 'register') {
+      feedback.className = 'auth-feedback auth-feedback-success';
+      feedback.textContent = 'Compte cree avec succes. Connectez-vous pour finaliser votre reservation.';
+      setAuthMode('login');
+      document.querySelector('#login-form input[name="email"]').value = payload.email || '';
+      return;
     }
   } catch (error) {
     console.error(`Erreur ${mode}:`, error);
