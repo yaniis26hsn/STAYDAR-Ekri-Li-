@@ -260,10 +260,16 @@
               <h2 class="section-title">Profil et appartements</h2>
               <p class="profile-intro">Gere tes informations et tes annonces depuis un seul endroit.</p>
             </div>
-            <button type="button" class="profile-back-button" onclick="showMainArea()">
-              <i class="fas fa-arrow-left"></i>
-              <span>Retour aux logements</span>
-            </button>
+            <div class="profile-hero-actions">
+              <button type="button" class="profile-back-button" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Deconnexion</span>
+              </button>
+              <button type="button" class="profile-back-button" onclick="showMainArea()">
+                <i class="fas fa-arrow-left"></i>
+                <span>Retour aux logements</span>
+              </button>
+            </div>
           </div>
 
           <p id="profile-feedback" class="profile-feedback hidden"></p>

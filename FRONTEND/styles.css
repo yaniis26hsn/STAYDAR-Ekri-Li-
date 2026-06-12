@@ -900,6 +900,12 @@ select.filter-input option {
   line-height: 1.7;
 }
 
+.profile-hero-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .profile-back-button,
 .profile-refresh-button,
 .profile-delete-button,

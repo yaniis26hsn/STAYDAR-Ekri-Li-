@@ -284,6 +284,14 @@ function openProfilePage() {
   loadProfileData();
 }
 
+function logout() {
+  localStorage.removeItem(TOKEN_STORAGE_KEY);
+  currentProfileUser = null;
+  currentProfileApparts = [];
+  updateProfileChip(null);
+  showMainArea();
+}
+
 function showMainArea() {
   const firstTabLink = document.querySelector('.tab-link');
   if (firstTabLink) {
