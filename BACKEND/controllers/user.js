@@ -26,17 +26,30 @@ export const updateUser = async (req,res)=>{
     const theUser = await User.findById(userId) ;
     if (!theUser) return res.status(404).send("user not found");
     
-    theUser.address = req.body.address ;
-    theUser.username = req.body.username ;
-    theUser.lname = req.body.lname;
-    theUser.fname = req.body.fname ;
-    theUser.phone = req.body.phone ;
-    theUser.email = req.body.email ;
-    theUser.contact = req.body.contact ;
-    theUser.town = req.body.town ;
+    applyUserUpdates(theUser,req.body)
     await theUser.save() ;
     res.send("succesfully updated") ;
 } 
+export const updateUserAdmin = async (req,res)=>{
+    
+    const theUser = await User.findById(req.params.id) ;
+    if (!theUser) return res.status(404).send("user not found");
+    
+    applyUserUpdates(theUser,req.body)
+    
+    await theUser.save() ;
+    res.send("succesfully updated") ;
+} 
+const applyUserUpdates = (user, body) => {
+  user.address = body.address;
+  user.username = body.username;
+  user.lname = body.lname;
+  user.fname = body.fname;
+  user.phone = body.phone;
+  user.email = body.email;
+  user.contact = body.contact;
+  user.town = body.town;
+};
 export const getUserApparts = async (req,res)=>{
      
     const userId = req.user.userId;
