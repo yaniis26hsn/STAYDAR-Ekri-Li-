@@ -17,7 +17,8 @@ export const getUserById = async (req,res)=>{
 }
 
 export const getUsersOfATown = async (req,res)=>{
-     const users = await User.find({town : req.params.town}) ;
+     const town = req.params.town.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+     const users = await User.find({town: {$regex: `^${town}$`, $options: 'i'}}) ;
     res.send(users) ;
 }
 
