@@ -9,7 +9,11 @@ const AppartementSchema = new mongoose.Schema({
   type: String ,
   rateSum : {type :Number , default: 0} ,
   ratersNbr : {type :Number , default: 0} ,
-  ownerId : String ,
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
   coordX : Number ,
   coordY : Number 
 });

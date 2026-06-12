@@ -22,6 +22,7 @@ export const getUsersOfATown = async (req,res)=>{
 }
 
 export const updateUser = async (req,res)=>{
+
     const userId = req.user.userId;
     const theUser = await User.findById(userId) ;
     if (!theUser) return res.status(404).send("user not found");
@@ -59,6 +60,10 @@ export const getUserApparts = async (req,res)=>{
     // to make sure that appart id won't be enough to delete it ,
 }
 export const getUserRating = async (req,res)=>{
+    // we could update the rating only when this was called ,
+    //  but since we assume there will few rates it s okay to update 
+    // the rating with each rate for this owner and this will just return the value 
+
   const theUser = await User.findById(req.params.id) ;
   if(!theUser) return res.status(404).send("not found")
   res.status(200).send({rating:theUser.rating}) ;

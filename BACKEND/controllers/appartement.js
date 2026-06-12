@@ -313,6 +313,22 @@ await Rating.updateOne(
   },
   { upsert: true }  // insert if not found
 )
+
+// Update owner's average rating eagerly so reads are always fast
+if (theApp.ownerId) {
+  const ownerApparts = await Appartement.find({ ownerId: theApp.ownerId });
+  let totalSum = 0;
+  let totalRaters = 0;
+  ownerApparts.forEach((a) => {
+    if (a.ratersNbr && a.rateSum) {
+      totalSum += a.rateSum;
+      totalRaters += a.ratersNbr;
+    }
+  });
+  const avgRating = totalRaters > 0 ? (totalSum / totalRaters) : null;
+  await User.findByIdAndUpdate(theApp.ownerId, { rating: avgRating });
+}
+
 res.send('seccess') ;
 }
 
