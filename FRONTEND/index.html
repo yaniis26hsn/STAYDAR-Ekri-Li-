@@ -40,6 +40,7 @@
         <a href="#" onclick="switchTab(1, event)" class="tab-link">Restaurants</a>
         <a href="#" onclick="switchTab(2, event)" class="tab-link">Transport</a>
         <a href="#" onclick="switchTab(3, event)" class="tab-link">Planning</a>
+        <a href="#" onclick="switchTab(5, event)" class="tab-link">Admin</a>
       </div>
 
       <div class="topbar-actions">
@@ -218,6 +219,37 @@
           <p>Ton planning de sejour sera ici avec les logements retenus, les etapes et les details pratiques.</p>
           <button class="planning-button">Creer un planning</button>
         </div>
+      </div>
+
+      <div id="tab-5" class="tab-content hidden">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Admin</p>
+            <h2 class="section-title">Gestion des utilisateurs</h2>
+            <p class="section-desc">Le panneau admin est visible pour tous. Les actions sensibles restent reservees aux comptes admin.</p>
+          </div>
+          <button class="filter-button" onclick="loadAdminUsers()">Actualiser</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-field">
+            <span class="filter-label">Filtrer par ville</span>
+            <input id="admin-search-town" class="filter-input" type="text" placeholder="Ex: Alger">
+          </div>
+          <div class="filter-actions">
+            <button class="filter-button" onclick="searchAdminUsers()">Rechercher</button>
+            <button class="filter-button filter-button-secondary" onclick="resetAdminFilters()">Reset</button>
+          </div>
+        </div>
+
+        <div id="admin-panel-message" class="section-kicker admin-panel-message">Veuillez cliquer sur Actualiser pour charger les utilisateurs.</div>
+
+        <div class="admin-actions" style="margin-bottom:1rem;">
+          <button class="filter-button" onclick="loadMyAppartmentsAdmin()">Voir mes appartements</button>
+        </div>
+        <div id="admin-my-apparts" class="listing-grid"></div>
+        <div class="listing-grid" id="admin-user-list"></div>
+        <div id="admin-user-detail" class="profile-card hidden"></div>
       </div>
 
       <div id="tab-4" class="tab-content hidden">

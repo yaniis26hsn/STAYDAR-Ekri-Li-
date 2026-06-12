@@ -1,9 +1,11 @@
-const API_BASE = "https://staydar-api.onrender.com/api/v1";
+const API_BASE = "/api/v1";
 const CLOSE_RADIUS_KM = 15;
 const TOKEN_STORAGE_KEY = "staydar_token";
 let appartements = [];
 let displayedAppartements = [];
 let selectedReservation = null;
+let adminUsers = [];
+let selectedAdminUser = null;
 let cursorGlow = null;
 
 function startGoogleAuth() {
@@ -394,6 +396,290 @@ function getUserIdFromStoredToken() {
   }
 }
 
+function getUserRoleFromStoredToken() {
+  const token = getStoredToken();
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = JSON.parse(atob(padded));
+    return decoded?.role || null;
+  } catch (err) {
+    console.error("Token invalide:", err);
+    return null;
+  }
+}
+
+function isAdminUser() {
+  return getUserRoleFromStoredToken() === "admin";
+}
+
+function setAdminPanelMessage(message) {
+  const msg = document.getElementById("admin-panel-message");
+  if (msg) {
+    msg.textContent = message;
+  }
+}
+
+function renderAdminUserList(users) {
+  const list = document.getElementById("admin-user-list");
+  if (!list) return;
+
+  if (!Array.isArray(users) || users.length === 0) {
+    list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Aucun utilisateur trouve.</p>';
+    return;
+  }
+
+  list.innerHTML = users.map((user) => {
+    const name = `${user.fname || ""} ${user.lname || ""}`.trim() || user.username || "Utilisateur";
+    return `
+      <article class="listing-card admin-user-card">
+        <div class="listing-body">
+          <div class="listing-topline">
+            <div>
+              <h3 class="listing-title">${escapeForAttribute(name)}</h3>
+              <p class="listing-address">${escapeForAttribute(user.email || "Pas d'email")}</p>
+            </div>
+            <span class="listing-surface">${escapeForAttribute(user.role || "normal")}</span>
+          </div>
+          <div class="listing-meta">
+            <span><i class="fas fa-phone"></i> ${escapeForAttribute(user.phone || "-")}</span>
+            <span><i class="fas fa-map-marker-alt"></i> ${escapeForAttribute(user.town || "-")}</span>
+          </div>
+          <div class="listing-footer">
+            <button class="listing-cta" onclick="selectAdminUser('${user._id}')">Voir</button>
+            <button class="listing-cta listing-cta-secondary" onclick="deleteAdminUser('${user._id}', '${escapeForAttribute(name)}')">Supprimer</button>
+            <button class="listing-cta listing-cta-tertiary" onclick="showUserRating('${user._id}')">Rating</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadAdminUsers() {
+  const list = document.getElementById("admin-user-list");
+  const detail = document.getElementById("admin-user-detail");
+  const myApparts = document.getElementById("admin-my-apparts");
+
+  if (detail) detail.classList.add("hidden");
+  if (myApparts) myApparts.innerHTML = "";
+  setAdminPanelMessage("Chargement des utilisateurs...");
+
+  if (!getStoredToken()) {
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Connectez-vous pour utiliser le panneau admin.</p>';
+    return;
+  }
+
+  if (!isAdminUser()) {
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Vous n\'êtes pas admin. Les actions restent restreintes.</p>';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/user`, {
+      headers: getAuthHeaders()
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    adminUsers = await res.json();
+    renderAdminUserList(adminUsers);
+    setAdminPanelMessage(`Liste des utilisateurs (${adminUsers.length}). Cliquez sur Voir pour details.`);
+  } catch (err) {
+    console.error("Erreur chargement admin users:", err);
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible de charger les utilisateurs.</p>';
+    setAdminPanelMessage("Erreur lors du chargement des utilisateurs.");
+  }
+}
+
+async function searchAdminUsers() {
+  const town = document.getElementById("admin-search-town")?.value.trim();
+  const endpoint = town ? `${API_BASE}/getUsersOfATown/${encodeURIComponent(town)}` : `${API_BASE}/user`;
+  const list = document.getElementById("admin-user-list");
+
+  if (!getStoredToken()) {
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Connectez-vous pour utiliser le panneau admin.</p>';
+    setAdminPanelMessage("Connexion requise.");
+    return;
+  }
+
+  if (!isAdminUser()) {
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Vous n\'êtes pas admin.</p>';
+    setAdminPanelMessage("Administration non autorisee.");
+    return;
+  }
+
+  try {
+    setAdminPanelMessage(town ? `Recherche des utilisateurs a ${town}...` : "Chargement des utilisateurs...");
+    const res = await fetch(endpoint, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const users = await res.json();
+    renderAdminUserList(users);
+    setAdminPanelMessage(users.length ? `Trouvé ${users.length} utilisateur(s).` : "Aucun utilisateur trouve.");
+  } catch (err) {
+    console.error("Erreur recherche admin users:", err);
+    if (list) list.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible de rechercher les utilisateurs.</p>';
+    setAdminPanelMessage("Erreur lors de la recherche.");
+  }
+}
+
+function resetAdminFilters() {
+  const townInput = document.getElementById("admin-search-town");
+  if (townInput) townInput.value = "";
+  loadAdminUsers();
+}
+
+async function selectAdminUser(userId) {
+  const detail = document.getElementById("admin-user-detail");
+  if (!detail) return;
+  detail.classList.add("hidden");
+  setAdminPanelMessage("Chargement du detail utilisateur...");
+
+  if (!getStoredToken() || !isAdminUser()) {
+    setAdminPanelMessage("Connexion admin requise pour voir les details.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/user/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const user = await res.json();
+    selectedAdminUser = user;
+    renderAdminUserDetail(user);
+    setAdminPanelMessage(`Details de ${user.fname || user.username || "utilisateur"}.`);
+  } catch (err) {
+    console.error("Erreur detail utilisateur:", err);
+    setAdminPanelMessage("Impossible de charger les details de l'utilisateur.");
+  }
+}
+
+async function deleteAdminUser(userId, userName) {
+  if (!window.confirm(`Supprimer l'utilisateur ${userName} ?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/user/${userId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    setAdminPanelMessage(`Utilisateur ${userName} supprime.`);
+    loadAdminUsers();
+  } catch (err) {
+    console.error("Erreur suppression utilisateur:", err);
+    setAdminPanelMessage("Impossible de supprimer l'utilisateur.");
+  }
+}
+
+async function showUserRating(userId) {
+  if (!getStoredToken() || !isAdminUser()) {
+    setAdminPanelMessage("Connexion admin requise pour voir la note utilisateur.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/userRating/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const rating = await res.json();
+    if (selectedAdminUser) {
+      renderAdminUserDetail(selectedAdminUser, rating);
+    } else {
+      setAdminPanelMessage(`Note recuperee : ${rating || "-"}. Cliquez sur Voir pour afficher le detail.`);
+    }
+  } catch (err) {
+    console.error("Erreur recup note utilisateur:", err);
+    setAdminPanelMessage("Impossible de recuperer la note utilisateur.");
+  }
+}
+
+function renderAdminUserDetail(user, rating = null) {
+  const detail = document.getElementById("admin-user-detail");
+  if (!detail) return;
+  detail.classList.remove("hidden");
+  detail.innerHTML = `
+    <div class="profile-card-head">
+      <div>
+        <p class="profile-card-kicker">Détails utilisateur</p>
+        <h3>${escapeForAttribute(`${user.fname || ""} ${user.lname || ""}`.trim() || user.username || "Utilisateur")}</h3>
+      </div>
+      <span class="profile-pill">${escapeForAttribute(user.role || "normal")}</span>
+    </div>
+    <div class="profile-form-grid">
+      <p><strong>Email:</strong> ${escapeForAttribute(user.email || "-")}</p>
+      <p><strong>Ville:</strong> ${escapeForAttribute(user.town || "-")}</p>
+      <p><strong>Téléphone:</strong> ${escapeForAttribute(user.phone || "-")}</p>
+      <p><strong>Adresse:</strong> ${escapeForAttribute(user.address || "-")}</p>
+      <p><strong>Username:</strong> ${escapeForAttribute(user.username || "-")}</p>
+      <p><strong>Note:</strong> ${rating !== null ? escapeForAttribute(String(rating)) : "Cliquez sur Rating"}</p>
+    </div>
+  `;
+}
+
+async function loadMyAppartmentsAdmin() {
+  const list = document.getElementById("admin-my-apparts");
+  if (!list) return;
+
+  if (!getStoredToken()) {
+    list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Connectez-vous pour voir vos appartements.</p>';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/getUserApparts`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const appartments = await res.json();
+    if (!Array.isArray(appartments) || appartments.length === 0) {
+      list.innerHTML = '<p class="col-span-full text-center text-slate-500 text-lg">Aucun appartement trouve.</p>';
+      return;
+    }
+    list.innerHTML = appartments.map((app) => `
+      <article class="listing-card">
+        <div class="listing-body">
+          <h3 class="listing-title">${escapeForAttribute(app.type || "Appartement")}</h3>
+          <p class="listing-address">${escapeForAttribute(app.address || "-")}</p>
+          <div class="listing-meta">
+            <span>${escapeForAttribute(app.town || "-")}</span>
+            <span>${escapeForAttribute(app.surface ? `${app.surface} m2` : "-")}</span>
+          </div>
+        </div>
+      </article>
+    `).join("");
+  } catch (err) {
+    console.error("Erreur chargement mes appartements:", err);
+    list.innerHTML = '<p class="col-span-full text-center text-rose-400 text-lg">Impossible de charger vos appartements.</p>';
+  }
+}
+
 async function submitRating(id, title, value, userId) {
   try {
     const res = await fetch(`${API_BASE}/rateAppartement/${value}`, {
@@ -532,6 +818,9 @@ function switchTab(n, event) {
   document.getElementById("tab-" + n).classList.remove("hidden");
   document.querySelectorAll(".tab-link").forEach((el) => el.classList.remove("tab-active"));
   if (event) event.currentTarget.classList.add("tab-active");
+  if (n === 5) {
+    loadAdminUsers();
+  }
 }
 
 async function searchAll() {
