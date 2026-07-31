@@ -88,7 +88,7 @@ function renderListings(data) {
     const ratingPickerId = `rating-picker-${item._id || ""}`;
 
     return `
-      <article class="card-hover listing-card">
+      <article class="card-hover listing-card" data-id="${item._id || ""}" data-title="${escapeForAttribute(title)}">
         <div class="listing-visual">
           <div class="listing-badge">${badge}</div>
           <div class="listing-visual-copy">
@@ -118,13 +118,13 @@ function renderListings(data) {
             </div>
             <div class="listing-rating-action">
               <div id="${ratingPickerId}" class="listing-rating-picker" data-selected-rating="0" aria-label="Choisir une note pour ${escapeForAttribute(title)}">
-                <button type="button" class="listing-picker-star" data-value="1" aria-label="1 etoile" onmouseenter="previewRating('${ratingPickerId}', 1)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 1)">☆</button>
-                <button type="button" class="listing-picker-star" data-value="2" aria-label="2 etoiles" onmouseenter="previewRating('${ratingPickerId}', 2)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 2)">☆</button>
-                <button type="button" class="listing-picker-star" data-value="3" aria-label="3 etoiles" onmouseenter="previewRating('${ratingPickerId}', 3)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 3)">☆</button>
-                <button type="button" class="listing-picker-star" data-value="4" aria-label="4 etoiles" onmouseenter="previewRating('${ratingPickerId}', 4)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 4)">☆</button>
-                <button type="button" class="listing-picker-star" data-value="5" aria-label="5 etoiles" onmouseenter="previewRating('${ratingPickerId}', 5)" onmouseleave="resetRatingPreview('${ratingPickerId}')" onclick="selectRating('${ratingPickerId}', 5)">☆</button>
+                <button type="button" class="listing-picker-star" data-value="1" aria-label="1 etoile">☆</button>
+                <button type="button" class="listing-picker-star" data-value="2" aria-label="2 etoiles">☆</button>
+                <button type="button" class="listing-picker-star" data-value="3" aria-label="3 etoiles">☆</button>
+                <button type="button" class="listing-picker-star" data-value="4" aria-label="4 etoiles">☆</button>
+                <button type="button" class="listing-picker-star" data-value="5" aria-label="5 etoiles">☆</button>
               </div>
-              <button onclick="handleRateClick('${item._id || ""}', '${escapeForAttribute(title)}', '${ratingPickerId}')" class="listing-rate-button">
+              <button class="listing-rate-button">
                 Noter
               </button>
             </div>
@@ -135,8 +135,7 @@ function renderListings(data) {
               <span class="listing-price-label">A partir de</span>
               <p class="listing-price">${price}</p>
             </div>
-            <button onclick="openAuthModal('${item._id || ""}', '${escapeForAttribute(title)}')"
-                    class="listing-cta">
+            <button class="listing-cta">
               Reserver
             </button>
           </div>
@@ -1066,6 +1065,57 @@ function getRatingStars(value) {
   return `${fullStars}${emptyStars}`;
 }
 
+function setupEventDelegation() {
+  const container = document.getElementById("listings");
+  if (!container) return;
+
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const card = btn.closest(".listing-card");
+    if (!card) return;
+
+    const id = card.dataset.id;
+    const title = card.dataset.title;
+
+    if (btn.classList.contains("listing-cta")) {
+      openAuthModal(id, title);
+      return;
+    }
+
+    if (btn.classList.contains("listing-rate-button")) {
+      const pickerId = `rating-picker-${id}`;
+      handleRateClick(id, title, pickerId);
+      return;
+    }
+
+    if (btn.classList.contains("listing-picker-star")) {
+      const picker = btn.closest(".listing-rating-picker");
+      if (!picker) return;
+      const value = Number(btn.dataset.value);
+      selectRating(picker.id, value);
+      return;
+    }
+  });
+
+  container.addEventListener("mouseenter", (e) => {
+    const star = e.target.closest(".listing-picker-star");
+    if (!star) return;
+    const picker = star.closest(".listing-rating-picker");
+    if (!picker) return;
+    previewRating(picker.id, Number(star.dataset.value));
+  }, true);
+
+  container.addEventListener("mouseleave", (e) => {
+    const star = e.target.closest(".listing-picker-star");
+    if (!star) return;
+    const picker = star.closest(".listing-rating-picker");
+    if (!picker) return;
+    resetRatingPreview(picker.id);
+  }, true);
+}
+
 window.onload = () => {
   cursorGlow = document.getElementById("cursor-glow");
   document.addEventListener("pointermove", handlePointerMove);
@@ -1074,6 +1124,7 @@ window.onload = () => {
   document.getElementById("filter-max-rating").addEventListener("input", updateRatingFilterState);
   document.getElementById("filter-exact-rating").addEventListener("input", updateRatingFilterState);
   updateRatingFilterState();
+  setupEventDelegation();
   handleOAuthRedirect();
   fetchListings();
 };
