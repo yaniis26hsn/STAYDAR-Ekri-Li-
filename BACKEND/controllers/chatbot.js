@@ -15,7 +15,7 @@ Si la question ne concerne pas Staydar, reponds poliment que tu ne peux aider qu
 
 export const chatWithBot = async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   const { message, history = [] } = req.body || {};
 
   if (!apiKey) {
