@@ -55,9 +55,15 @@ export const chatWithBot = async (req, res) => {
     clearTimeout(timer);
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API error:', response.status, errText);
-      return res.status(502).json({ error: 'Gemini API request failed' });
+      let detail = '';
+      try {
+        const errJson = await response.json();
+        detail = errJson?.error?.message || errJson?.error?.status || '';
+      } catch (_) {
+        detail = await response.text().catch(() => '');
+      }
+      console.error('Gemini API error:', response.status, detail);
+      return res.status(502).json({ error: 'Gemini API request failed: ' + detail });
     }
 
     const data = await response.json();
