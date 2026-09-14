@@ -89,7 +89,14 @@
       });
 
       if (!res.ok) {
-        throw new Error("HTTP " + res.status);
+        let detail = "";
+        try {
+          const errBody = await res.json();
+          detail = (errBody && errBody.error) || "";
+        } catch (_) { /* not json */ }
+        const label = "Erreur serveur (" + res.status + ")" + (detail ? " : " + detail : "");
+        console.error("Chatbot:", label);
+        throw new Error(label);
       }
 
       const data = await res.json();
@@ -105,11 +112,16 @@
         .slice(-MAX_HISTORY);
     } catch (err) {
       typing.remove();
-      addMessage(
-        "Je suis desole, je n'arrive pas a me connecter au serveur. " +
-          "Verifiez que l'intelligence artificielle est bien activee cote serveur, puis reessayez.",
-        "error"
-      );
+      const msg = (err && err.message) || "";
+      if (msg.indexOf("Erreur serveur") === 0) {
+        addMessage(msg, "error");
+      } else {
+        addMessage(
+          "Je suis desole, je n'arrive pas a me connecter au serveur. " +
+            "Verifiez que l'IA est bien activee cote serveur, puis reessayez.",
+          "error"
+        );
+      }
     } finally {
       setBusy(false);
       input.focus();
