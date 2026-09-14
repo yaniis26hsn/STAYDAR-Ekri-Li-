@@ -586,8 +586,47 @@
     </div>
   </div>
 
+  <button type="button" id="chatbot-fab" class="chatbot-fab" aria-label="Ouvrir l'assistant" aria-controls="chatbot-panel">
+    <span class="chatbot-fab-icon"><i class="fas fa-comment-dots"></i></span>
+    <span class="chatbot-fab-icon chatbot-fab-icon-close"><i class="fas fa-times"></i></span>
+  </button>
+
+  <aside id="chatbot-panel" class="chatbot-panel" aria-hidden="true">
+    <header class="chatbot-head">
+      <span class="chatbot-avatar"><i class="fas fa-robot"></i></span>
+      <div class="chatbot-head-copy">
+        <strong>Assistant Staydar</strong>
+        <span id="chatbot-status"><i class="fas fa-circle"></i> En ligne</span>
+      </div>
+      <button type="button" id="chatbot-close" class="chatbot-icon-btn" aria-label="Fermer l'assistant">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+
+    <div id="chatbot-messages" class="chatbot-messages" role="log" aria-live="polite">
+      <div class="chatbot-msg chatbot-msg-bot">
+        <p>Bonjour ! Je suis l'assistant de Staydar. Comment puis-je vous aider a utiliser le site ?</p>
+      </div>
+    </div>
+
+    <form id="chatbot-form" class="chatbot-form">
+      <input
+        type="text"
+        id="chatbot-input"
+        class="chatbot-input"
+        placeholder="Posez votre question..."
+        autocomplete="off"
+        maxlength="500"
+      />
+      <button type="submit" id="chatbot-send" class="chatbot-send" aria-label="Envoyer le message">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </form>
+  </aside>
+
   <script src="script.js"></script>
   <script src="profile.js"></script>
+  <script src="chatbot.js"></script>
 </body>
 </html>
 

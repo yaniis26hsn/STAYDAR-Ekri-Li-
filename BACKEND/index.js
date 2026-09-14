@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import appartementRouter from './routes/appartement.js'
 import userRouter from './routes/user.js'
 import authRouter from './routes/authn.js'
+import chatbotRouter from './routes/chatbot.js'
 import passport from 'passport';
 
 import './config/passport.js'; // importing it so it executes
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, "../FRONTEND")));
 app.use('/api/v1', appartementRouter) ;
 app.use('/api/v1', userRouter) ;
 app.use('/api/v1',authRouter) ;
+app.use('/api/v1', chatbotRouter);
 
 app.get("/{*path}", (req, res) => {
   res.sendFile(path.join(__dirname, "../FRONTEND/index.html"));
