@@ -19,9 +19,7 @@ const app = express()
 const port = process.env.PORT || 4000 ;
 // middlewares
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL
-}));
+app.use(cors());
 app.use(passport.initialize());
 app.use(express.json());
 

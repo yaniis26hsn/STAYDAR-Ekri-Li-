@@ -7,7 +7,7 @@
   const sendBtn = document.getElementById("chatbot-send");
   const closeBtn = document.getElementById("chatbot-close");
 
-  const API_URL = "/api/v1/chatbot";
+  const API_URL = "https://staydar-api.onrender.com/api/v1/chatbot";
   const MAX_HISTORY = 20;
 
   let chatHistory = [];
