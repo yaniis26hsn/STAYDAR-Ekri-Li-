@@ -46,7 +46,7 @@ export const chatWithBot = async (req, res) => {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents,
-          generationConfig: { temperature: 0.6, maxOutputTokens: 500 },
+          generationConfig: { temperature: 0.6, maxOutputTokens: 2048 },
         }),
         signal: controller.signal,
       }
